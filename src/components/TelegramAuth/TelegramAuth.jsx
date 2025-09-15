@@ -3,13 +3,13 @@ import './TelegramAuth.css';
 
 const TelegramAuth = ({ onAuth }) => {
   const [widgetLoaded, setWidgetLoaded] = useState(false);
-  const [error, setError] = useState(null);
 
+  // Получаем username бота из environment variables
   const botUsername = process.env.REACT_APP_TELEGRAM_BOT_USERNAME;
 
   useEffect(() => {
     if (!botUsername) {
-      setError('Telegram bot not configured');
+      console.error('Telegram bot username is not configured');
       return;
     }
 
@@ -28,8 +28,7 @@ const TelegramAuth = ({ onAuth }) => {
 
     script.onload = () => setWidgetLoaded(true);
     script.onerror = () => {
-      setError('Failed to load Telegram widget');
-      setWidgetLoaded(false);
+      console.error('Failed to load Telegram Widget');
     };
 
     document.body.appendChild(script);
@@ -38,14 +37,14 @@ const TelegramAuth = ({ onAuth }) => {
       document.body.removeChild(script);
       delete window.onTelegramAuth;
     };
-  }, [onAuth, botUsername]);
+  }, [botUsername, onAuth]);
 
-  if (error) {
+  if (!botUsername) {
     return (
       <div className="telegram-auth-container">
         <div className="telegram-fallback">
-          <p>⚠️ {error}</p>
-          <p>Please configure Telegram bot username</p>
+          <p>Telegram authentication is not configured</p>
+          <p>Please contact administrator</p>
         </div>
       </div>
     );

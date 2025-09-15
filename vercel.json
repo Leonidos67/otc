@@ -14,8 +14,5 @@
       "src": "/(.*)",
       "dest": "/index.html"
     }
-  ],
-  "env": {
-    "REACT_APP_TELEGRAM_BOT_USERNAME": "@telegram_bot_username"
-  }
+  ]
 }
