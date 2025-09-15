@@ -1,0 +1,17 @@
+.layout {
+  display: flex;
+  min-height: 100vh;
+  background-color: #000000;
+}
+
+.content {
+  flex: 1;
+  background-color: #111111;
+  margin: 10px;
+  border-radius: 12px;
+  padding: 20px;
+  border: 1px solid #333333;
+  min-height: calc(100vh - 20px);
+  margin-left: 250px; /* Точная ширина сайдбара */
+  width: calc(100% - 270px); /* 250px сайдбар + 20px отступов */
+}
