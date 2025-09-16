@@ -31,48 +31,30 @@ export const AuthProvider = ({ children }) => {
 
   const verifyTelegramAuth = async (userData) => {
     const isDevelopment = process.env.NODE_ENV === 'development';
-    
-    // Пропускаем проверку в режиме разработки
-    if (isDevelopment) {
-        console.log('Development mode: skipping Telegram auth verification');
-        return true;
-    }
-    
-    if (!API_URL) {
-        console.log('API check skipped - no API URL configured');
-        return true;
-    }
-    
+    if (isDevelopment) return true;
+
+    if (!API_URL) return true;
+
     try {
-        const response = await fetch(`${API_URL}/verify-telegram`, {
+      const response = await fetch(`${API_URL}/verify-telegram`, {
         method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(userData),
-        });
-        
-        if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        
-        const result = await response.json();
-        return result.success;
+      });
+      if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+      const result = await response.json();
+      return result.success;
     } catch (error) {
-        console.error('Auth verification failed:', error);
-        return false;
+      console.error('Auth verification failed:', error);
+      return false;
     }
-};
+  };
 
   const login = async (userData) => {
     try {
-      if (API_URL) {
-        const isValid = await verifyTelegramAuth(userData);
-        if (!isValid) {
-          throw new Error('Telegram authentication failed');
-        }
-      }
-      
+      const isValid = API_URL ? await verifyTelegramAuth(userData) : true;
+      if (!isValid) throw new Error('Telegram authentication failed');
+
       const userToSave = {
         id: userData.id,
         first_name: userData.first_name,
@@ -82,10 +64,8 @@ export const AuthProvider = ({ children }) => {
         auth_date: userData.auth_date,
         hash: userData.hash
       };
-      
       setUser(userToSave);
       localStorage.setItem('telegram_user', JSON.stringify(userToSave));
-      
     } catch (error) {
       console.error('Login error:', error);
       throw error;
@@ -103,18 +83,18 @@ export const AuthProvider = ({ children }) => {
     localStorage.setItem('telegram_user', JSON.stringify(updatedUser));
   };
 
-  const value = {
-    user,
-    login,
-    logout,
-    updateUser,
-    loading,
-    isAuthenticated: !!user,
-    apiUrl: API_URL
-  };
-
   return (
-    <AuthContext.Provider value={value}>
+    <AuthContext.Provider
+      value={{
+        user,
+        login,
+        logout,
+        updateUser,
+        loading,
+        isAuthenticated: !!user,
+        apiUrl: API_URL
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );
