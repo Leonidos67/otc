@@ -68,3 +68,83 @@
 .table tr:hover {
   background-color: #1a1a1a;
 }
+
+/* Меню вкладок профиля */
+.menu-container {
+  position: relative;
+  display: flex;
+  gap: 6px; /* уменьшенные отступы между кнопками */
+}
+
+.profile-tab-button {
+  padding: 8px 12px;
+  background: none; /* нет фонового цвета по умолчанию */
+  border: none; /* убран бордер */
+  color: #888888; /* текст неактивных пунктов */
+  cursor: pointer;
+  font-weight: 500;
+  position: relative;
+  transition: color 0.3s;
+  z-index: 1; /* чтобы текст был выше фонового индикатора */
+}
+
+.profile-tab-button.active-tab {
+  color: #ffffff; /* текст активной вкладки */
+  font-weight: 600;
+}
+
+/* Индикатор фона, который двигается при hover */
+.hover-indicator {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  background-color: #000000; /* фон активной вкладки */
+  border-radius: 6px;
+  transition: left 0.3s, width 0.3s;
+  z-index: 0; /* под текстом */
+}
+
+/* Hover эффект текста */
+.profile-tab-button:hover {
+  color: #ffffff; /* текст становится белым на hover */
+}
+
+.profile-header {
+  display: flex;
+  align-items: center;
+  gap: 16px; /* расстояние между фото и именем */
+  margin-bottom: 20px;
+}
+
+.profile-photo {
+  width: 96px;
+  height: 96px;
+  border-radius: 50%; /* круглая фотография */
+  object-fit: cover;
+  border: 2px solid #333; /* лёгкий бордер для контраста */
+}
+
+.profile-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.profile-name {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #ffffff;
+  margin: 0;
+}
+
+.profile-username {
+  font-size: 1rem;
+  color: #888888;
+  margin: 2px 0 0 0;
+}
+
+.profile-page-title {
+  font-size: 1.125rem; /* 3xl */
+  font-weight: 700;
+  margin-bottom: 10px;
+}
