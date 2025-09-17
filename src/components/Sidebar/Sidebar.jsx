@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
+import WalletConnectButton from '../WalletConnectButton';
 import './Sidebar.css';
 
 const Sidebar = () => {
@@ -20,20 +21,22 @@ const Sidebar = () => {
     navigate(path);
   };
 
+  
+
+  const handleSettings = () => {
+    console.log('Открыть настройки');
+  };
+
   const handleLogout = () => {
     logout();
     navigate('/login');
   };
 
-  const handleSettings = () => {
-    // Действие для кнопки настроек
-    console.log('Открыть настройки');
-  };
-
   return (
     <div className="sidebar">
       <nav className="sidebar-nav">
-        {menuItems.slice(0, -1).map((item) => (
+        {/* Верхнее меню */}
+        {menuItems.map((item) => (
           <button
             key={item.path}
             onClick={() => handleNavigation(item.path)}
@@ -42,31 +45,12 @@ const Sidebar = () => {
             {item.label}
           </button>
         ))}
-        
-        {/* Нижняя часть с профилем и кнопками */}
+
+        {/* Пункт "Мой профиль" уже добавлен в верхнее меню */}
+
+        {/* Нижняя часть: кнопка подключения кошелька */}
         <div className="sidebar-bottom">
-          <div className="profile-section">
-            <button
-              onClick={() => handleNavigation('/profile')}
-              className={`nav-item profile-item ${activeItem === '/profile' ? 'active' : ''}`}
-            >
-              {user?.first_name || 'Мой профиль'}
-            </button>
-            <button
-              onClick={handleSettings}
-              className="icon-button"
-              aria-label="Настройки"
-            >
-              ⚙️
-            </button>
-            <button
-              onClick={handleLogout}
-              className="icon-button"
-              aria-label="Выйти"
-            >
-              ⎋
-            </button>
-          </div>
+          <WalletConnectButton />
         </div>
       </nav>
     </div>

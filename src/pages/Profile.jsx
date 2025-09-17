@@ -1,10 +1,9 @@
 import React, { useState, useEffect, useRef } from "react";
-import WalletConnectButton from "../components/WalletConnectButton";
 import { useAuth } from "../contexts/AuthContext";
 import "./PageStyles.css";
 
 const Profile = () => {
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
   const [activeTab, setActiveTab] = useState("Общие");
 
   const menuRef = useRef(null);
@@ -14,7 +13,6 @@ const Profile = () => {
     "Общие",
     "Подключенные аккаунты",
     "Безопасность и конфиденциальность",
-    "Способы оплаты",
     "История выставления счетов",
     "Членства",
   ];
@@ -23,54 +21,34 @@ const Profile = () => {
     switch (activeTab) {
       case "Общие":
         return (
-          <div className="content-box">
-            <h2>Основная информация</h2>
-            <p>Имя: {user?.first_name} {user?.last_name}</p>
-            <p>Username: @{user?.username}</p>
-            <p>ID: {user?.id}</p>
-          </div>
+          <>
+            <div className="input-group">
+              <label>Имя</label>
+              <input type="text" value={user?.first_name || ""} readOnly />
+            </div>
+            <div className="input-group">
+              <label>Username</label>
+              <input type="text" value={user?.username || ""} readOnly />
+            </div>
+            <div className="input-group">
+              <label>ID</label>
+              <input type="text" value={user?.id || ""} readOnly />
+            </div>
+          </>
         );
       case "Подключенные аккаунты":
-        return (
-          <div className="content-box">
-            <h2>Подключенные аккаунты</h2>
-            <p>Здесь будут ваши подключенные аккаунты Telegram и TON Wallet.</p>
-          </div>
-        );
+        return <p>Здесь будут ваши подключенные аккаунты Telegram и TON Wallet.</p>;
       case "Безопасность и конфиденциальность":
-        return (
-          <div className="content-box">
-            <h2>Безопасность и конфиденциальность</h2>
-            <p>Настройки пароля, двухфакторной аутентификации и видимости профиля.</p>
-          </div>
-        );
-      case "Способы оплаты":
-        return (
-          <div className="content-box">
-            <h2>Способы оплаты</h2>
-            <p>Добавьте или удалите ваши способы оплаты для услуг.</p>
-          </div>
-        );
+        return <p>Настройки пароля, двухфакторной аутентификации и видимости профиля.</p>;
       case "История выставления счетов":
-        return (
-          <div className="content-box">
-            <h2>История счетов</h2>
-            <p>Просмотрите историю выставленных вам счетов.</p>
-          </div>
-        );
+        return <p>Просмотрите историю выставленных вам счетов.</p>;
       case "Членства":
-        return (
-          <div className="content-box">
-            <h2>Членства</h2>
-            <p>Ваши активные подписки и членства.</p>
-          </div>
-        );
+        return <p>Ваши активные подписки и членства.</p>;
       default:
         return null;
     }
   };
 
-  // Эффект движения фона
   useEffect(() => {
     const buttons = menuRef.current.querySelectorAll(".profile-tab-button");
 
@@ -103,23 +81,21 @@ const Profile = () => {
   return (
     <div className="p-6">
       <h1 className="profile-page-title">Мой профиль</h1>
-      <hr style={{ borderColor: "#000", marginBottom: "20px" }} />
+      <hr className="divider" style={{ marginTop: "8px" }} />
 
       <div className="flex items-center mb-6 profile-header">
         <img
-          src={user?.photo_url || "https://via.placeholder.com/96"} // стоковая картинка для теста
+          src={user?.photo_url || "https://via.placeholder.com/96"}
           alt="Profile"
           className="profile-photo"
         />
         <div className="profile-info">
-          <p className="profile-name">
-            {user?.first_name || "Имя"} {user?.last_name || "Фамилия"}
-          </p>
+          <p className="profile-name">{user?.first_name || "Имя"}</p>
           <p className="profile-username">@{user?.username || "username"}</p>
         </div>
       </div>
 
-
+      <hr className="divider-nav" />
       <div className="menu-container mb-6 relative" ref={menuRef}>
         {menuItems.map((item) => (
           <button
@@ -132,10 +108,12 @@ const Profile = () => {
         ))}
         <div className="hover-indicator" ref={indicatorRef} />
       </div>
+      <hr className="divider" />
 
-      {renderTabContent()}
-
-      <WalletConnectButton />
+      <div className="tab-content">{renderTabContent()}</div>
+      <button className="logout-button" onClick={logout}>
+        Выйти
+      </button>
     </div>
   );
 };

@@ -11,7 +11,7 @@ const Login = () => {
   const handleTelegramAuth = async (userData) => {
     try {
       await login(userData);
-      navigate('/profile'); // перенаправление на страницу профиля
+      navigate('/'); // перенаправление на страницу профиля
     } catch (e) {
       console.error('Ошибка входа через Telegram:', e);
     }

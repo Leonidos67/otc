@@ -190,3 +190,24 @@
   flex-shrink: 0;
   font-size: 16px;
 }
+
+.connect-wallet-button {
+  background-color: #1a1a1a;
+  color: #fff;
+  font-weight: 600;
+  border: 1px solid #333;
+  border-radius: 8px;
+  margin-top: 10px;
+  padding: 14px 16px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  width: 100%;
+  text-align: center;
+}
+
+.connect-wallet-button:hover {
+  background-color: #2d2d2d;
+  border-color: #444;
+}
+
+

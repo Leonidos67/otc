@@ -3,5 +3,5 @@ import { TonConnect } from "@tonconnect/sdk";
 
 // создаём TonConnect
 export const tonConnect = new TonConnect({
-  manifestUrl: "https://YOUR_DOMAIN/tonconnect-manifest.json"
+  manifestUrl: 'https://otcgamp.vercel.app/tonconnect-manifest.json'
 });

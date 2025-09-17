@@ -1,4 +1,5 @@
 import React from 'react';
+import WalletConnectButton from '../components/WalletConnectButton';
 import './PageStyles.css';
 
 const Home = () => {
@@ -6,6 +7,11 @@ const Home = () => {
     <div id="main">
       <h1>Главная страница</h1>
       <p>Добро пожаловать в торговую платформу OTC!</p>
+      <div className="content-box" style={{ marginBottom: '16px' }}>
+        <h2>Подключите кошелек TON</h2>
+        <p>Чтобы продолжить, подключите Tonkeeper или другой поддерживаемый кошелек.</p>
+        <WalletConnectButton />
+      </div>
       
       <div className="stats-grid">
         <div className="stat-card">
