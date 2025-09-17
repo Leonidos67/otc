@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import WalletConnectButton from '../WalletConnectButton';
@@ -13,6 +13,10 @@ const Sidebar = ({ isOpen = true, onToggle }) => {
   const location = useLocation();
   const { user, logout } = useAuth();
   const [activeItem, setActiveItem] = useState(location.pathname);
+
+  useEffect(() => {
+    setActiveItem(location.pathname);
+  }, [location.pathname]);
 
   const menuItems = [
     { path: '/', label: 'Главная' },
@@ -46,10 +50,6 @@ const Sidebar = ({ isOpen = true, onToggle }) => {
           return (
             <button
               key={item.path}
-              onMouseEnter={() => setActiveItem(item.path)}
-              onFocus={() => setActiveItem(item.path)}
-              onMouseLeave={() => setActiveItem(location.pathname)}
-              onBlur={() => setActiveItem(location.pathname)}
               onClick={() => handleNavigation(item.path)}
               className={`nav-item ${isActive ? 'active' : ''}`}
               style={{ display: 'flex', gap: 10, alignItems: 'center' }}
@@ -74,15 +74,11 @@ const Sidebar = ({ isOpen = true, onToggle }) => {
         <div className="sidebar-bottom">
           <button
             className="nav-item profile-item"
-            onMouseEnter={() => setActiveItem('menu')}
-            onFocus={() => setActiveItem('menu')}
-            onMouseLeave={() => setActiveItem(location.pathname)}
-            onBlur={() => setActiveItem(location.pathname)}
             onClick={onToggle}
             style={{ display: 'flex', alignItems: 'center', gap: 8, justifyContent: 'center' }}
           >
-            <MenuIcon animate={activeItem === 'menu'} />
-            <span className="nav-text">menu</span>
+            <MenuIcon animate={false} width={20} height={20} stroke="#ffffff" strokeWidth={1.8} />
+            <span className="nav-text">свернуть</span>
           </button>
         </div>
       </nav>

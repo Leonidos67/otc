@@ -4,6 +4,12 @@
   background-color: #000000;
 }
 
+@media (max-width: 768px) {
+  .layout {
+    overflow-x: hidden; /* не даем уехать по горизонтали */
+  }
+}
+
 .content {
   flex: 1;
   background-color: #111111;
@@ -34,29 +40,46 @@
 
 @media (max-width: 768px) {
   .mobile-menu-toggle {
-    display: flex;
+    display: none;
   }
-  .content {
-    margin-left: 0;
-    width: calc(100% - 20px);
-    padding-bottom: 72px; /* место под нижнюю навигацию */
+  .layout {
+    --mobile-nav-height: 72px; /* фиксированная высота нижнего меню */
+    padding: 10px; /* отступы по краям на черном фоне */
+    padding-bottom: calc(10px + var(--mobile-nav-height) + 10px); /* место под меню + внешний отступ снизу */
+    box-sizing: border-box;
+  }
+  .layout .content {
+    margin: 0 !important; /* контент без внешних отступов, отступы дает .layout */
+    width: 100% !important;
+    padding: 20px !important; /* внутренние отступы как на ПК */
+    border-radius: 12px !important;
+    border: 1px solid #333333 !important; /* обводка */
+    min-height: calc(100vh - 20px); /* учитываем только padding .layout */
+    padding-bottom: var(--mobile-nav-height) !important; /* отступ под нижнее меню */
+    box-sizing: border-box;
+  }
+  /* Жёстко переопределяем правило свернутого сайдбара на мобилках */
+  .layout.sidebar-closed .content {
+    margin: 0 !important;
+    margin-left: 0 !important;
+    width: 100% !important;
   }
 }
 
 /* Нижняя мобильная навигация */
 .mobile-bottom-nav {
   position: fixed;
-  bottom: 10px;
-  left: 10px;
-  right: 10px;
-  height: 52px;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 64px; /* значение по умолчанию */
   background: #1a1a1a;
-  border: 1px solid #333;
-  border-radius: 12px;
+  border-top: 1px solid #333;
   display: none;
   align-items: center;
   justify-content: space-around;
   z-index: 1200;
+  width: 100%; /* избегаем 100vw чтобы не появлялся горизонтальный скролл */
 }
 
 .mobile-bottom-nav-item {
@@ -64,11 +87,21 @@
   background: none;
   border: none;
   font: inherit;
-  padding: 10px 12px;
-  border-radius: 8px;
+  padding: 6px 10px;
+  border-radius: 0;
   display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 8px;
+  justify-content: center;
+  gap: 4px;
+  flex: 1 1 0%;
+  width: auto; /* равномерное распределение, без выхода за ширину */
+  height: 100%;
+}
+
+.mobile-bottom-nav-item svg {
+  width: 22px;
+  height: 22px;
 }
 
 .mobile-bottom-nav-item:active,
@@ -76,14 +109,35 @@
   background: #2d2d2d;
 }
 
+/* Активная вкладка нижней навигации */
+.mobile-bottom-nav-item.active {
+  background: #242424;
+  color: #ffffff;
+  font-weight: 600;
+  box-shadow: inset 0 0 0 1px #3a3a3a;
+}
+
+.mobile-bottom-nav-item.active svg {
+  filter: drop-shadow(0 0 2px rgba(255,255,255,0.25));
+}
+
 @media (max-width: 768px) {
   .mobile-bottom-nav {
     display: flex;
+    height: var(--mobile-nav-height);
+    box-sizing: border-box;
+    padding: 0; /* убираем внутренний отступ от пунктов */
+    border-radius: 30px; /* скругления родительского блока */
+    overflow: hidden; /* чтобы дети не вылезали за скругления */
+    left: 10px; /* внешний отступ от сайта */
+    right: 10px; /* внешний отступ от сайта */
+    bottom: 10px; /* внешний отступ снизу */
+    width: auto; /* учитываем left/right вместо width:100% */
   }
 }
 
 /* Десктоп: сворачивание сайдбара */
 .layout.sidebar-closed .content {
-  margin-left: 70px;
-  width: calc(100% - 90px);
+  margin-left: 84px;
+  width: calc(100% - 104px);
 }

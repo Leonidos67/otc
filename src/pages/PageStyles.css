@@ -36,6 +36,7 @@
   align-items: center;
   gap: 16px;
   margin-bottom: 20px;
+  justify-content: space-between;
 }
 
 .profile-photo {
@@ -49,6 +50,25 @@
 .profile-info {
   display: flex;
   flex-direction: column;
+}
+
+.profile-actions {
+  min-width: 220px;
+}
+
+@media (max-width: 768px) {
+  .profile-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+  .profile-actions {
+    min-width: 0;
+    width: 100%;
+  }
+  .profile-actions > * {
+    width: 100% !important; /* кнопка на всю ширину */
+  }
 }
 
 .profile-name {
@@ -85,12 +105,49 @@
   margin: 0 0 5px 0;
 }
 
+/* Растягиваем разделители на всю ширину в профиле */
+.profile-page .divider,
+.profile-page .divider-nav {
+  margin-left: -20px;
+  margin-right: -20px;
+}
+
 /* Меню вкладок */
 .menu-container {
   position: relative;
   display: flex;
   gap: 6px;
   margin-bottom: 5px;
+  flex-wrap: nowrap; /* не переносить элементы на новую строку */
+  overflow-x: auto; /* горизонтальная прокрутка при переполнении */
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch; /* плавная прокрутка на iOS */
+}
+
+/* Тёмные стили скроллбара для вкладок (WebKit-браузеры) */
+.menu-container::-webkit-scrollbar {
+  height: 8px; /* горизонтальный скролл */
+}
+
+.menu-container::-webkit-scrollbar-track {
+  background: #0d0d0d; /* тёмный трек */
+  border-radius: 8px;
+}
+
+.menu-container::-webkit-scrollbar-thumb {
+  background: #2a2a2a; /* тёмный ползунок */
+  border-radius: 8px;
+  border: 1px solid #333; /* лёгкая обводка */
+}
+
+.menu-container::-webkit-scrollbar-thumb:hover {
+  background: #343434;
+}
+
+/* Тёмные стили скроллбара для Firefox */
+.menu-container {
+  scrollbar-color: #2a2a2a #0d0d0d; /* thumb track */
+  scrollbar-width: thin;
 }
 
 .profile-tab-button {
@@ -103,6 +160,7 @@
   position: relative;
   transition: color 0.3s;
   z-index: 1;
+  flex: 0 0 auto; /* фиксированная ширина по контенту, не сжимать */
 }
 
 .profile-tab-button.active-tab {

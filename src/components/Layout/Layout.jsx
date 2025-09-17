@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import Sidebar from '../Sidebar/Sidebar';
 import './Layout.css';
 import UserIcon from '../Icons/User';
@@ -8,15 +8,15 @@ import BlocksIcon from '../Icons/Blocks';
 
 const Layout = ({ children }) => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
     const onResize = () => {
-      if (window.innerWidth > 768) {
-        setIsSidebarOpen(true);
-      } else {
-        setIsSidebarOpen(false);
-      }
+      const mobile = window.innerWidth <= 768;
+      setIsMobile(mobile);
+      setIsSidebarOpen(!mobile);
     };
     onResize();
     window.addEventListener('resize', onResize);
@@ -26,35 +26,40 @@ const Layout = ({ children }) => {
   const toggleSidebar = () => setIsSidebarOpen((v) => !v);
 
   const go = (path) => navigate(path);
+  const isActive = (path) => location.pathname === path;
 
   return (
     <div className={`layout ${isSidebarOpen ? 'sidebar-open' : 'sidebar-closed'}`}>
-      <button
-        className="mobile-menu-toggle"
-        aria-label="Меню"
-        onClick={toggleSidebar}
-      >
-        <svg fill="none" height="9" viewBox="0 0 21 9" width="21" xmlns="http://www.w3.org/2000/svg">
-          <path d="M1 1L19.6667 1" stroke="currentColor" strokeLinecap="round" strokeWidth="1.6"></path>
-          <path d="M1 7.7998L10.3333 7.7998" stroke="currentColor" strokeLinecap="round" strokeWidth="1.6"></path>
-        </svg>
-      </button>
-      <Sidebar isOpen={isSidebarOpen} onToggle={toggleSidebar} />
+      {!isMobile && (
+        <>
+          <button
+            className="mobile-menu-toggle"
+            aria-label="Меню"
+            onClick={toggleSidebar}
+          >
+            <svg fill="none" height="9" viewBox="0 0 21 9" width="21" xmlns="http://www.w3.org/2000/svg">
+              <path d="M1 1L19.6667 1" stroke="currentColor" strokeLinecap="round" strokeWidth="1.6"></path>
+              <path d="M1 7.7998L10.3333 7.7998" stroke="currentColor" strokeLinecap="round" strokeWidth="1.6"></path>
+            </svg>
+          </button>
+          <Sidebar isOpen={isSidebarOpen} onToggle={toggleSidebar} />
+        </>
+      )}
       <main className="content">
         {children}
       </main>
       <div className="mobile-bottom-nav">
-        <button className="mobile-bottom-nav-item" onClick={() => go('/')}>
+        <button className={`mobile-bottom-nav-item ${isActive('/') ? 'active' : ''}`} onClick={() => go('/')} aria-current={isActive('/') ? 'page' : undefined}>
           <BlocksIcon />
-          Главная
+          <span className="mobile-bottom-nav-label">Главная</span>
         </button>
-        <button className="mobile-bottom-nav-item" onClick={() => go('/deals')}>
+        <button className={`mobile-bottom-nav-item ${isActive('/deals') ? 'active' : ''}`} onClick={() => go('/deals')} aria-current={isActive('/deals') ? 'page' : undefined}>
           <AlbumIcon />
-          Сделки
+          <span className="mobile-bottom-nav-label">Сделки</span>
         </button>
-        <button className="mobile-bottom-nav-item" onMouseEnter={() => {}} onClick={() => go('/profile')}>
+        <button className={`mobile-bottom-nav-item ${isActive('/profile') ? 'active' : ''}`} onClick={() => go('/profile')} aria-current={isActive('/profile') ? 'page' : undefined}>
           <UserIcon animate={false} />
-          Профиль
+          <span className="mobile-bottom-nav-label">Профиль</span>
         </button>
       </div>
     </div>

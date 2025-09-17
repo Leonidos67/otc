@@ -80,11 +80,11 @@ const Profile = () => {
   }, [activeTab]);
 
   return (
-    <div className="p-6">
+    <div className="p-6 profile-page">
       <h1 className="profile-page-title">Мой профиль</h1>
       <hr className="divider" style={{ marginTop: "8px" }} />
 
-      <div className="flex items-center mb-6 profile-header" style={{ justifyContent: 'space-between', gap: 16 }}>
+      <div className="flex items-center mb-6 profile-header">
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
           <img
             src={user?.photo_url || "https://via.placeholder.com/96"}
@@ -96,7 +96,7 @@ const Profile = () => {
             <p className="profile-username">@{user?.username || "username"}</p>
           </div>
         </div>
-        <div style={{ minWidth: 220 }}>
+        <div className="profile-actions">
           <WalletConnectButton />
         </div>
       </div>

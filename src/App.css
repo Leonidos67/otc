@@ -10,6 +10,11 @@ body {
   color: white;
 }
 
+html, body, #root {
+  width: 100%;
+  overflow-x: hidden; /* запрещаем горизонтальную прокрутку */
+}
+
 .loading {
   display: flex;
   justify-content: center;

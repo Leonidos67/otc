@@ -19,7 +19,7 @@
 }
 
 .nav-item {
-  color: white;
+  color: #e6e6e6; /* немного мягче белого */
   text-decoration: none;
   padding: 14px 16px;
   border-radius: 8px;
@@ -38,7 +38,7 @@
 }
 
 .nav-item:hover {
-  background-color: #1a1a1a;
+  background-color: #1f1f1f;
 }
 
 /* Подсветка иконок при ховере всей кнопки */
@@ -54,7 +54,7 @@
 }
 
 .nav-item:active {
-  background-color: #2d2d2d;
+  background-color: #2a2a2a;
 }
 
 .sidebar-bottom {
@@ -126,8 +126,10 @@
 
 /* Состояние активного пункта меню */
 .nav-item.active {
-  background-color: #2d2d2d;
+  background-color: #242424;
   font-weight: 600;
+  color: #ffffff;
+  box-shadow: inset 0 0 0 1px #3a3a3a;
 }
 
 /* Анимация для плавного появления */
@@ -154,10 +156,12 @@
 /* Адаптивность для мобильных устройств */
 @media (max-width: 768px) {
   .sidebar {
-    width: 200px;
-    padding: 15px;
+    width: 100vw; /* во всю ширину на мобильных */
+    padding: 10px 0; /* убираем боковые отступы */
     transform: translateX(-100%);
     transition: transform 0.3s ease;
+    left: 0;
+    right: 0;
   }
   
   .sidebar.open {
@@ -165,31 +169,53 @@
   }
   
   .nav-item {
-    padding: 12px 14px;
-    font-size: 13px;
+    padding: 14px 16px; /* комфортные клики */
+    font-size: 14px;
+    width: 100%;
+    border-radius: 0; /* элементы меню во всю ширину без скруглений */
+    background-color: transparent;
+    border-top: 1px solid #141414;
+    border-bottom: 1px solid #141414;
   }
   
   .icon-button {
     width: 40px;
     height: 40px;
   }
-  
-  .content {
-    margin-left: 200px;
-    width: calc(100% - 220px);
-  }
 }
 
 /* Десктоп: состояние свернутого сайдбара */
 @media (min-width: 769px) {
   .layout.sidebar-closed .sidebar {
-    width: 70px;
+    width: 84px; /* 20px padding left + 44px button + 20px padding right */
+  }
+  .layout.sidebar-closed .sidebar-nav {
+    align-items: center;
   }
   .layout.sidebar-closed .nav-item {
     justify-content: center;
+    align-items: center;
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    margin: 0 auto;
   }
   .layout.sidebar-closed .nav-item .nav-text {
     display: none;
+  }
+  .layout.sidebar-closed .sidebar-bottom .nav-item {
+    justify-content: center;
+    align-items: center;
+    width: 44px;
+    height: 44px;
+    padding: 0;
+  }
+  .layout.sidebar-closed .sidebar-bottom .nav-item svg {
+    width: 20px !important;
+    height: 20px !important;
+    display: block !important;
+    min-width: 20px;
+    min-height: 20px;
   }
 }
 
