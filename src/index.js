@@ -8,6 +8,7 @@ root.render(
   <React.StrictMode>
     <TonConnectUIProvider
       manifestUrl={`https://otcgamp.vercel.app/tonconnect-manifest.json`}
+      uiPreferences={{ theme: 'DARK' }}
     >
       <App />
     </TonConnectUIProvider>

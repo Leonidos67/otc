@@ -22,7 +22,11 @@ const ProtectedRoute = ({ children }) => {
 function AppContent() {
   return (
     <Routes>
-      <Route path="/login" element={<Login />} />
+      <Route path="/login" element={
+        <Layout>
+          <Login />
+        </Layout>
+      } />
       <Route path="/" element={
         <ProtectedRoute>
           <Layout>

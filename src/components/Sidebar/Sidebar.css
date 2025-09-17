@@ -41,6 +41,18 @@
   background-color: #1a1a1a;
 }
 
+/* Подсветка иконок при ховере всей кнопки */
+.nav-item:hover svg {
+  filter: drop-shadow(0 0 2px rgba(255,255,255,0.25));
+}
+
+.nav-avatar {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
 .nav-item:active {
   background-color: #2d2d2d;
 }
@@ -50,6 +62,17 @@
   padding-top: 20px;
   border-top: 1px solid #333;
   width: 100%;
+}
+
+.wallet-button-container {
+  width: 100%;
+}
+
+/* Принудительно растягиваем TonConnect кнопку */
+.wallet-button-container .tc-connect-button,
+.wallet-button-container .tc-root .tc-connect-button,
+.wallet-button-container .tc-root .tc-connect-button button {
+  width: 100% !important;
 }
 
 .profile-section {
@@ -154,6 +177,19 @@
   .content {
     margin-left: 200px;
     width: calc(100% - 220px);
+  }
+}
+
+/* Десктоп: состояние свернутого сайдбара */
+@media (min-width: 769px) {
+  .layout.sidebar-closed .sidebar {
+    width: 70px;
+  }
+  .layout.sidebar-closed .nav-item {
+    justify-content: center;
+  }
+  .layout.sidebar-closed .nav-item .nav-text {
+    display: none;
   }
 }
 

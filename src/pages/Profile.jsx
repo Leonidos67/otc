@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
+import WalletConnectButton from "../components/WalletConnectButton";
 import { useAuth } from "../contexts/AuthContext";
 import "./PageStyles.css";
 
@@ -83,15 +84,20 @@ const Profile = () => {
       <h1 className="profile-page-title">Мой профиль</h1>
       <hr className="divider" style={{ marginTop: "8px" }} />
 
-      <div className="flex items-center mb-6 profile-header">
-        <img
-          src={user?.photo_url || "https://via.placeholder.com/96"}
-          alt="Profile"
-          className="profile-photo"
-        />
-        <div className="profile-info">
-          <p className="profile-name">{user?.first_name || "Имя"}</p>
-          <p className="profile-username">@{user?.username || "username"}</p>
+      <div className="flex items-center mb-6 profile-header" style={{ justifyContent: 'space-between', gap: 16 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+          <img
+            src={user?.photo_url || "https://via.placeholder.com/96"}
+            alt="Profile"
+            className="profile-photo"
+          />
+          <div className="profile-info">
+            <p className="profile-name">{user?.first_name || "Имя"}</p>
+            <p className="profile-username">@{user?.username || "username"}</p>
+          </div>
+        </div>
+        <div style={{ minWidth: 220 }}>
+          <WalletConnectButton />
         </div>
       </div>
 

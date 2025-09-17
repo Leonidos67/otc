@@ -15,3 +15,75 @@
   margin-left: 250px; /* Точная ширина сайдбара */
   width: calc(100% - 270px); /* 250px сайдбар + 20px отступов */
 }
+
+.mobile-menu-toggle {
+  position: fixed;
+  left: 12px;
+  top: 12px;
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  border: 1px solid #333;
+  background: #1a1a1a;
+  color: #fff;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 1100;
+}
+
+@media (max-width: 768px) {
+  .mobile-menu-toggle {
+    display: flex;
+  }
+  .content {
+    margin-left: 0;
+    width: calc(100% - 20px);
+    padding-bottom: 72px; /* место под нижнюю навигацию */
+  }
+}
+
+/* Нижняя мобильная навигация */
+.mobile-bottom-nav {
+  position: fixed;
+  bottom: 10px;
+  left: 10px;
+  right: 10px;
+  height: 52px;
+  background: #1a1a1a;
+  border: 1px solid #333;
+  border-radius: 12px;
+  display: none;
+  align-items: center;
+  justify-content: space-around;
+  z-index: 1200;
+}
+
+.mobile-bottom-nav-item {
+  color: #fff;
+  background: none;
+  border: none;
+  font: inherit;
+  padding: 10px 12px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.mobile-bottom-nav-item:active,
+.mobile-bottom-nav-item:hover {
+  background: #2d2d2d;
+}
+
+@media (max-width: 768px) {
+  .mobile-bottom-nav {
+    display: flex;
+  }
+}
+
+/* Десктоп: сворачивание сайдбара */
+.layout.sidebar-closed .content {
+  margin-left: 70px;
+  width: calc(100% - 90px);
+}
