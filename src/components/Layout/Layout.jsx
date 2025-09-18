@@ -11,6 +11,7 @@ const Layout = ({ children }) => {
   const [isMobile, setIsMobile] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
+  const isAuthPage = location.pathname === '/login';
 
   useEffect(() => {
     const onResize = () => {
@@ -29,8 +30,8 @@ const Layout = ({ children }) => {
   const isActive = (path) => location.pathname === path;
 
   return (
-    <div className={`layout ${isSidebarOpen ? 'sidebar-open' : 'sidebar-closed'}`}>
-      {!isMobile && (
+    <div className={`layout ${isSidebarOpen ? 'sidebar-open' : 'sidebar-closed'} ${isAuthPage ? 'auth-page' : ''}`}>
+      {!isMobile && !isAuthPage && (
         <>
           <button
             className="mobile-menu-toggle"
@@ -48,6 +49,7 @@ const Layout = ({ children }) => {
       <main className="content">
         {children}
       </main>
+      {!isAuthPage && (
       <div className="mobile-bottom-nav">
         <button className={`mobile-bottom-nav-item ${isActive('/') ? 'active' : ''}`} onClick={() => go('/')} aria-current={isActive('/') ? 'page' : undefined}>
           <BlocksIcon />
@@ -62,6 +64,7 @@ const Layout = ({ children }) => {
           <span className="mobile-bottom-nav-label">Профиль</span>
         </button>
       </div>
+      )}
     </div>
   );
 };

@@ -1,3 +1,26 @@
+.step-banner {
+  position: relative;
+  margin: 8px 0 12px 0;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.step-banner::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background: #0f172a;
+  background-image: radial-gradient(circle, rgba(139,92,246,0.6) 1px, transparent 1px),
+                    radial-gradient(circle, rgba(59,130,246,0.4) 1px, transparent 1px),
+                    radial-gradient(circle, rgba(236,72,153,0.5) 1px, transparent 1px);
+  background-size: 20px 20px, 40px 40px, 60px 60px;
+  background-position: 0 0, 10px 10px, 30px 30px;
+}
+
+.step-banner .step-header { position: relative; z-index: 1; padding: 12px; text-align: center; }
+.step-banner .step-title { color: #e5e7eb; font-weight: 700; margin-bottom: 8px; }
+
 /* Общие стили контента */
 .content-box {
   background-color: #1a1a1a;
@@ -28,6 +51,129 @@
   width: 100%;
   font-size: 1rem;
   cursor: default;
+}
+
+/* Селекты такие же, как инпуты */
+.input-group select {
+  background-color: #1a1a1a;
+  border: none;
+  border-radius: 6px;
+  padding: 10px;
+  color: #fff;
+  width: 100%;
+  font-size: 1rem;
+}
+
+/* Кнопка назад у заголовка */
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #bbb;
+}
+
+.back-link:hover {
+  color: #fff;
+}
+
+/* Прогресс шагов (линейный) */
+.step-header { margin: 8px 0 12px 0; text-align: center; }
+.step-title { color: #bbb; font-weight: 600; margin-bottom: 8px; }
+.progress { width: 100%; margin: 0 auto; }
+.progress-track {
+  width: 100%;
+  height: 10px;
+  background: #0d0d0d;
+  border: 1px solid #222;
+  border-radius: 999px;
+  overflow: hidden;
+}
+.progress-fill {
+  height: 100%;
+  border-right: none;
+  border-radius: 999px;
+  background: #ffffff;
+  position: relative;
+}
+
+/* Карточки выбора метода оплаты (шаг 1) */
+.method-cards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+
+.method-card {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #0d0d0d;
+  border: 1px solid #222;
+  border-radius: 12px;
+  padding: 16px;
+  color: #e5e7eb;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.method-card:hover { background: #151515; border-color: #2a2a2a; }
+.method-card.selected { background: #1a1a1a; border-color: #3a3a3a; }
+.method-title { font-weight: 600; }
+
+.error-text {
+  color: #fca5a5;
+  font-size: 0.95rem;
+}
+
+/* Simplified Brand-light credit card styles */
+.credit-card {
+  width: 316px;
+  height: 190px;
+  border-radius: 16px;
+  padding: 16px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.credit-card.brand-light {
+  background: #ffffff;
+  color: #111827;
+  border: 1px solid #e5e7eb;
+}
+
+.credit-card__company { font-weight: 700; }
+.credit-card__number { font-size: 1.1rem; letter-spacing: 1px; }
+.credit-card__footer { display: flex; justify-content: space-between; gap: 12px; }
+.credit-card .label { color: #6b7280; font-size: 0.75rem; }
+.credit-card .value { color: #111827; font-weight: 600; }
+
+/* Разделители между этапами внутри белой заливки */
+/* Убраны разделители внутри прогресса */
+
+.step-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 16px;
+}
+
+.arrow-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: #1a1a1a;
+  color: #fff;
+  border: 1px solid #333;
+  border-radius: 8px;
+  padding: 10px 14px;
+  cursor: pointer;
+}
+
+.arrow-btn[disabled] {
+  cursor: not-allowed;
+  opacity: 0.6;
 }
 
 /* Профиль */
@@ -92,11 +238,52 @@
   color: #fff;
 }
 
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.create-deal-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background-color: #1a1a1a;
+  color: #fff;
+  font-weight: 600;
+  border: 1px solid #333;
+  border-radius: 8px;
+  padding: 10px 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.create-deal-button:hover {
+  background-color: #2d2d2d;
+  border-color: #444;
+}
+
+.create-deal-button:active {
+  background-color: #333;
+}
+
+@media (max-width: 768px) {
+  .page-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .create-deal-button {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
 /* Разделители */
 .divider {
   border: 1px solid #222;
   height: 1px;
-  margin: 0 0 20px 0;
+  margin: 0 0 5px 0;
 }
 
 .divider-nav {
@@ -112,11 +299,20 @@
   margin-right: -20px;
 }
 
+/* Растягиваем баннер создания сделки от края до края, как разделители */
+.profile-page .create-deal-banner {
+  width: calc(100% + 40px); /* растягиваем с учетом паддингов контента */
+  margin-left: -20px; /* смещаем влево на padding контента */
+  margin-right: 0; /* правый край совпадает с краем контента */
+  box-sizing: border-box;
+}
+
 /* Меню вкладок */
 .menu-container {
   position: relative;
   display: flex;
   gap: 6px;
+  margin-top: 5px; /* отступ сверху от пунктов */
   margin-bottom: 5px;
   flex-wrap: nowrap; /* не переносить элементы на новую строку */
   overflow-x: auto; /* горизонтальная прокрутка при переполнении */
@@ -186,6 +382,71 @@
 /* Контент вкладок */
 .tab-content {
   margin-top: 15px;
+}
+
+.empty-state {
+  text-align: center;
+  color: #cfcfcf;
+  padding: 24px 12px;
+}
+
+.empty-state h3 {
+  margin: 0 0 6px 0;
+  font-size: 1.05rem;
+  color: #ffffff;
+}
+
+.empty-state p {
+  margin: 0;
+  color: #999999;
+}
+
+/* Баннер создания сделки над пустым состоянием */
+.create-deal-banner {
+  position: relative;
+  display: block;
+  width: 100%;
+  min-height: 96px; /* ниже высота */
+  border-radius: 0; /* без скруглений */
+  overflow: hidden;
+  text-decoration: none;
+  cursor: pointer;
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+.create-deal-banner .banner-bg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background: #000000;
+  background-image: linear-gradient(to right, rgba(255,255,255,0.06) 1px, transparent 1px),
+                    linear-gradient(to bottom, rgba(255,255,255,0.06) 1px, transparent 1px),
+                    radial-gradient(circle, rgba(255,255,255,0.6) 1px, transparent 1px);
+  background-size: 20px 20px, 20px 20px, 20px 20px;
+  background-position: 0 0, 0 0, 0 0;
+}
+
+.create-deal-banner .banner-content {
+  position: relative;
+  z-index: 1;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center; /* центрируем иконку и текст по центру */
+  gap: 10px;
+  color: #ffffff;
+  font-weight: 600;
+  text-align: center;
+  width: 100%; /* контент баннера во всю ширину */
+}
+
+/* Гарантируем минимальную высоту и центрирование по вертикали */
+.create-deal-banner {
+  min-height: 96px; /* синхронизируем меньшую высоту */
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 /* Кнопка выхода */
