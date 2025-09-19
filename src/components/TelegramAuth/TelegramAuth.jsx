@@ -1,9 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import './TelegramAuth.css';
 
 const TelegramAuth = ({ onAuth }) => {
   const [widgetLoaded, setWidgetLoaded] = useState(false);
   const [error, setError] = useState(null);
+  const containerRef = useRef(null);
 
   const botUsername = process.env.REACT_APP_TELEGRAM_BOT_USERNAME;
   const isDevelopment = process.env.NODE_ENV === 'development';
@@ -11,11 +12,6 @@ const TelegramAuth = ({ onAuth }) => {
   useEffect(() => {
     if (!botUsername) {
       setError('Bot username not configured');
-      return;
-    }
-
-    if (isDevelopment) {
-      setError('Telegram widget disabled in development mode');
       return;
     }
 
@@ -38,10 +34,16 @@ const TelegramAuth = ({ onAuth }) => {
       setWidgetLoaded(false);
     };
 
-    document.body.appendChild(script);
+    // Mount the widget inside our container for proper placement on the login page
+    const mountTarget = containerRef.current || document.body;
+    mountTarget.appendChild(script);
 
     return () => {
-      document.body.removeChild(script);
+      try {
+        mountTarget.removeChild(script);
+      } catch (_) {
+        // ignore if already removed
+      }
       delete window.onTelegramAuth;
     };
   }, [botUsername, onAuth, isDevelopment]);
@@ -59,24 +61,17 @@ const TelegramAuth = ({ onAuth }) => {
     onAuth(mockUser);
   };
 
+  // Single-button fallback: if the widget fails to load (e.g. localhost),
+  // show our own Telegram login button that simulates auth in development.
   if (error) {
     return (
       <div className="telegram-auth-container">
-        <div className="telegram-fallback">
-          <h3>{isDevelopment ? 'Development Mode' : 'Configuration Error'}</h3>
-          <p>{error}</p>
-          {isDevelopment ? (
-            <div>
-              <p>Telegram widget doesn't work on localhost.</p>
-              <button className="telegram-dev-button" onClick={handleDevLogin}>
-                Simulate Telegram Login (Dev)
-              </button>
-              <p className="telegram-dev-note">This will create a test user for development</p>
-            </div>
-          ) : (
-            <p>Please check bot domain settings in @BotFather</p>
-          )}
-        </div>
+        <button className="telegram-dev-button" onClick={handleDevLogin}>
+          Войти через Telegram
+        </button>
+        <p className="telegram-dev-note">
+          {isDevelopment ? 'Dev: эмуляция входа (виджет недоступен на localhost)' : 'Ошибка загрузки виджета'}
+        </p>
       </div>
     );
   }
@@ -84,16 +79,14 @@ const TelegramAuth = ({ onAuth }) => {
   if (!widgetLoaded) {
     return (
       <div className="telegram-auth-container">
-        <div className="telegram-fallback">
-          <p>Loading Telegram authentication...</p>
-        </div>
+        <div id="telegram-login-container" ref={containerRef}></div>
       </div>
     );
   }
 
   return (
     <div className="telegram-auth-container">
-      <div id="telegram-login-container"></div>
+      <div id="telegram-login-container" ref={containerRef}></div>
     </div>
   );
 };

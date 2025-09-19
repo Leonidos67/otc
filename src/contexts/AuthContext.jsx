@@ -14,6 +14,7 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  // Default to local serverless path; in development verification is skipped anyway
   const API_URL = process.env.REACT_APP_API_URL || '/api';
 
   useEffect(() => {

@@ -1,0 +1,12 @@
+# Copy this file to .env and fill values.
+# Client-side variables must be prefixed with REACT_APP_
+
+# Required: Telegram bot username (without @). Used to render login widget
+REACT_APP_TELEGRAM_BOT_USERNAME=YourBotUsername
+
+# Optional: Backend base URL for verifying Telegram auth.
+# Leave empty to skip server verification (client-only login)
+REACT_APP_API_URL=
+
+# Build environment (usually set by toolchain; do not change manually)
+# NODE_ENV=production
