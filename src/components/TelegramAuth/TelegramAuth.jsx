@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import './TelegramAuth.css';
 
 const TelegramAuth = ({ onAuth }) => {
@@ -8,27 +8,39 @@ const TelegramAuth = ({ onAuth }) => {
   const botUsername = process.env.REACT_APP_TELEGRAM_BOT_USERNAME;
   const isDevelopment = process.env.NODE_ENV === 'development';
 
+  const containerRef = useRef(null);
+
   useEffect(() => {
     if (!botUsername) {
       setError('Bot username not configured');
+      setWidgetLoaded(false);
       return;
     }
 
-    // Для разработки показываем заглушку вместо виджета
-    if (isDevelopment) {
-      setError('Telegram widget disabled in development mode');
+    const container = containerRef.current;
+    if (!container) {
+      // Подождём следующий кадр, контейнер может ещё не смонтироваться
+      requestAnimationFrame(() => {
+        if (!containerRef.current) {
+          setError('Login container not found');
+          setWidgetLoaded(false);
+        }
+      });
       return;
     }
+
+    // Очищаем контейнер перед вставкой виджета
+    container.innerHTML = '';
 
     const script = document.createElement('script');
-    script.src = "https://telegram.org/js/telegram-widget.js?22";
+    script.src = 'https://telegram.org/js/telegram-widget.js?22';
     script.async = true;
     script.setAttribute('data-telegram-login', botUsername);
     script.setAttribute('data-size', 'large');
     script.setAttribute('data-radius', '10');
     script.setAttribute('data-request-access', 'write');
     script.setAttribute('data-onauth', 'onTelegramAuth(user)');
-    
+
     window.onTelegramAuth = (user) => {
       onAuth(user);
     };
@@ -39,13 +51,15 @@ const TelegramAuth = ({ onAuth }) => {
       setWidgetLoaded(false);
     };
 
-    document.body.appendChild(script);
+    container.appendChild(script);
 
     return () => {
-      document.body.removeChild(script);
+      try {
+        container.innerHTML = '';
+      } catch (_) {}
       delete window.onTelegramAuth;
     };
-  }, [botUsername, onAuth, isDevelopment]);
+  }, [botUsername, onAuth]);
 
   // Для разработки - кнопка для имитации входа
   const handleDevLogin = () => {
@@ -61,22 +75,7 @@ const TelegramAuth = ({ onAuth }) => {
     onAuth(mockUser);
   };
 
-  // Для разработки показываем только кнопку входа
-  if (isDevelopment) {
-    return (
-      <div className="telegram-auth-container">
-        <button 
-          onClick={handleDevLogin}
-          className="telegram-login-button"
-        >
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.568 8.16c-.169 1.858-.896 6.728-.896 6.728-.896 6.728-.896 6.728-.896 6.728l-1.404 4.608c-.107.352-.375.576-.675.576-.3 0-.568-.224-.675-.576l-1.404-4.608c-.169-1.858-.896-6.728-.896-6.728-.896-6.728-.896-6.728-.896-6.728l-1.404-4.608c-.107-.352.107-.704.375-.704.3 0 .568.224.675.576l1.404 4.608c.169 1.858.896 6.728.896 6.728.896 6.728.896 6.728.896 6.728l1.404 4.608c.107.352-.107.704-.375.704-.3 0-.568-.224-.675-.576l-1.404-4.608z"/>
-          </svg>
-          Simulate Telegram Login (Dev)
-        </button>
-      </div>
-    );
-  }
+  // В разработке показываем и виджет, и кнопку симуляции
 
   if (error) {
     return (
@@ -85,6 +84,11 @@ const TelegramAuth = ({ onAuth }) => {
           <h3>⚠️ Configuration Error</h3>
           <p>{error}</p>
           <p>Please check bot domain settings in @BotFather</p>
+          {isDevelopment && (
+            <button onClick={handleDevLogin} className="telegram-login-button" style={{ marginTop: 12 }}>
+              Simulate Telegram Login (Dev)
+            </button>
+          )}
         </div>
       </div>
     );
@@ -102,7 +106,12 @@ const TelegramAuth = ({ onAuth }) => {
 
   return (
     <div className="telegram-auth-container">
-      <div id="telegram-login-container"></div>
+      <div id="telegram-login-container" ref={containerRef}></div>
+      {isDevelopment && (
+        <button onClick={handleDevLogin} className="telegram-login-button" style={{ marginTop: 12 }}>
+          Simulate Telegram Login (Dev)
+        </button>
+      )}
     </div>
   );
 };
