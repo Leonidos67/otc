@@ -1,12 +1,21 @@
-# Copy this file to .env and fill values.
-# Client-side variables must be prefixed with REACT_APP_
+РАЗРАБОТКА
+# MONGODB_URI=mongodb+srv://wotbmadgamesexe_db_user:ZB4gK0bRWb9MZ0ZV@cluster0.khxt9b2.mongodb.net/
 
-# Required: Telegram bot username (without @). Used to render login widget
-REACT_APP_TELEGRAM_BOT_USERNAME=YourBotUsername
+JWT_SECRET=4233242d8293b38be0c53831f9ee0e47
 
-# Optional: Backend base URL for verifying Telegram auth.
-# Leave empty to skip server verification (client-only login)
-REACT_APP_API_URL=
+REACT_APP_TELEGRAM_BOT_USERNAME=gamp_otc_bot
+TELEGRAM_BOT_TOKEN=8125282996:AAFJjz6zKPoJXlXfqgwbm1CzsSlT612560s
 
-# Build environment (usually set by toolchain; do not change manually)
-# NODE_ENV=production
+REACT_APP_API_URL=http://localhost:3001/api
+
+
+
+ДЕПЛОЙ
+# MONGODB_URI=mongodb+srv://wotbmadgamesexe_db_user:ZB4gK0bRWb9MZ0ZV@cluster0.khxt9b2.mongodb.net/
+
+JWT_SECRET=4233242d8293b38be0c53831f9ee0e47
+
+REACT_APP_TELEGRAM_BOT_USERNAME=gamp_otc_bot
+TELEGRAM_BOT_TOKEN=8125282996:AAFJjz6zKPoJXlXfqgwbm1CzsSlT612560s
+
+REACT_APP_API_URL=https://otcgamp.vercel.app/api

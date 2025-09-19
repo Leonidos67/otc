@@ -15,6 +15,16 @@ const TelegramAuth = ({ onAuth }) => {
       return;
     }
 
+    // Check if we're on localhost - Telegram widget won't work there
+    const isLocalhost = window.location.hostname === 'localhost' || 
+                       window.location.hostname === '127.0.0.1' ||
+                       window.location.hostname === '0.0.0.0';
+
+    if (isLocalhost || isDevelopment) {
+      setError('Telegram widget not available on localhost - using fallback');
+      return;
+    }
+
     const script = document.createElement('script');
     script.src = 'https://telegram.org/js/telegram-widget.js?22';
     script.async = true;
@@ -70,7 +80,9 @@ const TelegramAuth = ({ onAuth }) => {
           Войти через Telegram
         </button>
         <p className="telegram-dev-note">
-          {isDevelopment ? 'Dev: эмуляция входа (виджет недоступен на localhost)' : 'Ошибка загрузки виджета'}
+          {isDevelopment || window.location.hostname === 'localhost' ? 
+            'Режим разработки: эмуляция входа (Telegram виджет недоступен на localhost)' : 
+            'Ошибка загрузки виджета'}
         </p>
       </div>
     );
