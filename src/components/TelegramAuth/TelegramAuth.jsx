@@ -9,6 +9,7 @@ const TelegramAuth = ({ onAuth }) => {
   const isDevelopment = process.env.NODE_ENV === 'development';
 
   const containerRef = useRef(null);
+  const [mountAttempt, setMountAttempt] = useState(0);
 
   useEffect(() => {
     if (!botUsername) {
@@ -19,14 +20,9 @@ const TelegramAuth = ({ onAuth }) => {
 
     const container = containerRef.current;
     if (!container) {
-      // Подождём следующий кадр, контейнер может ещё не смонтироваться
-      requestAnimationFrame(() => {
-        if (!containerRef.current) {
-          setError('Login container not found');
-          setWidgetLoaded(false);
-        }
-      });
-      return;
+      // Ждём появления контейнера с экспоненциальной задержкой, без ошибки пользователю
+      const timeout = setTimeout(() => setMountAttempt((n) => n + 1), Math.min(500, 50 * (mountAttempt + 1)));
+      return () => clearTimeout(timeout);
     }
 
     // Очищаем контейнер перед вставкой виджета
@@ -59,7 +55,8 @@ const TelegramAuth = ({ onAuth }) => {
       } catch (_) {}
       delete window.onTelegramAuth;
     };
-  }, [botUsername, onAuth]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [botUsername, onAuth, mountAttempt]);
 
   // Для разработки - кнопка для имитации входа
   const handleDevLogin = () => {
