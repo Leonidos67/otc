@@ -4,13 +4,41 @@
   align-items: center;
   min-height: 100vh;
   padding: 20px;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #000000;
+  z-index: 1000;
 }
 
 .login-container .content-box {
-  max-width: 400px;
+  max-width: 600px;
   text-align: center;
-  background-color: #1a1a1a;
+  background-color: #111;
   border: 1px solid #333;
-  border-radius: 12px;
-  padding: 40px;
+  border-radius: 30px;
+  padding: 24px 80px; /* меньше отступы сверху/снизу, стандарт по бокам */
+}
+
+/* Убираем лишние внешние отступы у заголовка и описания */
+.login-container .content-box h1 {
+  margin: 0; /* без отступа сверху/снизу у заголовка */
+}
+
+.login-container .content-box p {
+  margin: 10px 0 16px; /* расстояние между заголовком и описанием, чуть больше перед кнопкой */
+}
+
+/* Убираем внутренние отступы у контейнера кнопки и контролируем расстояние сверху */
+.login-container .telegram-auth-container {
+  padding: 0;
+  min-height: auto;
+  margin-top: 12px; /* зазор между текстом и кнопкой */
+}
+
+/* Кнопка без дополнительных внешних отступов снизу */
+.login-container .telegram-login-button {
+  margin: 0;
 }

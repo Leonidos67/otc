@@ -61,37 +61,30 @@ const TelegramAuth = ({ onAuth }) => {
     onAuth(mockUser);
   };
 
+  // Для разработки показываем только кнопку входа
+  if (isDevelopment) {
+    return (
+      <div className="telegram-auth-container">
+        <button 
+          onClick={handleDevLogin}
+          className="telegram-login-button"
+        >
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.568 8.16c-.169 1.858-.896 6.728-.896 6.728-.896 6.728-.896 6.728-.896 6.728l-1.404 4.608c-.107.352-.375.576-.675.576-.3 0-.568-.224-.675-.576l-1.404-4.608c-.169-1.858-.896-6.728-.896-6.728-.896-6.728-.896-6.728-.896-6.728l-1.404-4.608c-.107-.352.107-.704.375-.704.3 0 .568.224.675.576l1.404 4.608c.169 1.858.896 6.728.896 6.728.896 6.728.896 6.728.896 6.728l1.404 4.608c.107.352-.107.704-.375.704-.3 0-.568-.224-.675-.576l-1.404-4.608z"/>
+          </svg>
+          Simulate Telegram Login (Dev)
+        </button>
+      </div>
+    );
+  }
+
   if (error) {
     return (
       <div className="telegram-auth-container">
         <div className="telegram-fallback">
-          <h3>⚠️ {isDevelopment ? 'Development Mode' : 'Configuration Error'}</h3>
+          <h3>⚠️ Configuration Error</h3>
           <p>{error}</p>
-          {isDevelopment && (
-            <div>
-              <p>Telegram widget doesn't work on localhost.</p>
-              <button 
-                onClick={handleDevLogin}
-                style={{
-                  padding: '12px 24px',
-                  backgroundColor: '#4CAF50',
-                  color: 'white',
-                  border: 'none',
-                  borderRadius: '8px',
-                  cursor: 'pointer',
-                  marginTop: '15px'
-                }}
-              >
-                Simulate Telegram Login (Dev)
-              </button>
-              <p style={{ fontSize: '12px', marginTop: '10px', color: '#666' }}>
-                This will create a test user for development
-              </p>
-            </div>
-          )}
-          {!isDevelopment && (
-            <p>Please check bot domain settings in @BotFather</p>
-          )}
+          <p>Please check bot domain settings in @BotFather</p>
         </div>
       </div>
     );

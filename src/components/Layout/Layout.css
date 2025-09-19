@@ -171,3 +171,19 @@ html, body {
   margin-left: 84px;
   width: calc(100% - 104px);
 }
+
+/* Стили для страницы входа - полностью скрываем сайдбар */
+.layout.auth-page .content {
+  margin: 0 !important;
+  margin-left: 0 !important;
+  width: 100% !important;
+  height: 100vh !important;
+  border: none !important;
+  border-radius: 0 !important;
+  padding: 0 !important;
+  background-color: transparent !important;
+}
+
+.layout.auth-page {
+  background-color: #000000 !important;
+}
