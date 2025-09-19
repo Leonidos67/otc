@@ -1,32 +1,28 @@
 .step-banner {
   position: relative;
-  margin: 8px 0 12px 0;
-  border-radius: 8px;
+  margin: 5px 0 5px 0;
   overflow: hidden;
 }
 
-.step-banner::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-  background: #0f172a;
-  background-image: radial-gradient(circle, rgba(139,92,246,0.6) 1px, transparent 1px),
-                    radial-gradient(circle, rgba(59,130,246,0.4) 1px, transparent 1px),
-                    radial-gradient(circle, rgba(236,72,153,0.5) 1px, transparent 1px);
-  background-size: 20px 20px, 40px 40px, 60px 60px;
-  background-position: 0 0, 10px 10px, 30px 30px;
-}
-
-.step-banner .step-header { position: relative; z-index: 1; padding: 12px; text-align: center; }
-.step-banner .step-title { color: #e5e7eb; font-weight: 700; margin-bottom: 8px; }
+.step-banner .step-header { position: relative; z-index: 1; padding: 1px; text-align: center; }
+.step-banner .step-title { font-weight: 700; margin-bottom: 8px; }
 
 /* Общие стили контента */
 .content-box {
-  background-color: #1a1a1a;
-  border-radius: 8px;
-  padding: 20px;
-  margin: 15px 0;
+  background-color: transparent;
+  border-radius: 0;
+  border: none;
+  padding: 0;
+  margin: 0;
+}
+
+/* Универсальный блок секции с тёмным фоном (как раньше) */
+.section-box {
+  background: #0d0d0d;
+  border: 1px solid #222;
+  border-radius: 12px;
+  padding: 16px;
+  margin: 12px 0;
 }
 
 /* Инпуты */
@@ -43,17 +39,16 @@
 }
 
 .input-group input {
-  background-color: #1a1a1a; /* темный фон */
+  background-color: #1a1a1a;
   border: none;
   border-radius: 6px;
   padding: 10px;
   color: #fff;
   width: 100%;
   font-size: 1rem;
-  cursor: default;
+  /* cursor: not-allowed; */
 }
 
-/* Селекты такие же, как инпуты */
 .input-group select {
   background-color: #1a1a1a;
   border: none;
@@ -148,6 +143,84 @@
 .credit-card__footer { display: flex; justify-content: space-between; gap: 12px; }
 .credit-card .label { color: #6b7280; font-size: 0.75rem; }
 .credit-card .value { color: #111827; font-weight: 600; }
+
+.credit-card__add {
+  width: 100%;
+  background: #f3f4f6;
+  color: #111827;
+  border: 1px dashed #d1d5db;
+  border-radius: 10px;
+  padding: 10px 12px;
+  cursor: pointer;
+  font-weight: 600;
+}
+.credit-card__add:hover {
+  background: #e5e7eb;
+}
+
+/* Simple modal styles */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.7);
+  backdrop-filter: blur(2px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+}
+.modal {
+  width: 100%;
+  max-width: 420px;
+  background: #111111;
+  border: 1px solid #333;
+  border-radius: 12px;
+  padding: 16px;
+}
+
+.modal-grip {
+  width: 100%;
+  background: transparent;
+  border: none;
+  padding: 6px 0 10px 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: grab;
+  touch-action: none; /* allow custom touch drag */
+}
+.modal-grip-bar {
+  width: 48px;
+  height: 5px;
+  border-radius: 999px;
+  background: #333;
+}
+
+/* Bottom Sheet behavior on mobile */
+@media (max-width: 768px) {
+  @keyframes sheet-up {
+    from { transform: translateY(100%); }
+    to { transform: translateY(0); }
+  }
+  .modal {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    max-width: none;
+    width: 100%;
+    border-radius: 16px 16px 0 0;
+    border-left: 1px solid #333;
+    border-right: 1px solid #333;
+    border-bottom: none;
+    padding: 16px 16px calc(env(safe-area-inset-bottom) + 16px);
+    box-shadow: 0 -8px 24px rgba(0,0,0,0.45);
+    transform: translateY(0);
+    animation: sheet-up 200ms ease-out;
+    max-height: 75vh;
+    overflow-y: auto;
+  }
+}
 
 /* Разделители между этапами внутри белой заливки */
 /* Убраны разделители внутри прогресса */
@@ -470,3 +543,4 @@
 button.WalletConnectButton {
   margin-top: 15px;
 }
+

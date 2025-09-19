@@ -6,6 +6,7 @@ import Home from './pages/Home';
 import Deals from './pages/Deals';
 import CreateDeal from './pages/CreateDeal';
 import Profile from './pages/Profile';
+import SecurityPasscode from './pages/SecurityPasscode';
 import Login from './pages/Login';
 import './App.css';
 
@@ -53,6 +54,13 @@ function AppContent() {
         <ProtectedRoute>
           <Layout>
             <Profile />
+          </Layout>
+        </ProtectedRoute>
+      } />
+      <Route path="/security/passcode" element={
+        <ProtectedRoute>
+          <Layout>
+            <SecurityPasscode />
           </Layout>
         </ProtectedRoute>
       } />

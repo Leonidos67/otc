@@ -1,0 +1,91 @@
+.credit-card {
+  position: relative;
+  background: #ffffff;
+  color: inherit;
+  border-radius: 16px;
+  padding: 16px;
+}
+
+.corner-tri {
+  --corner-color: #e5e7eb;
+  --corner-size: 12px;
+  --corner-inset: 2px; /* thickness of the outline */
+  position: absolute;
+  width: 0;
+  height: 0;
+  transition: transform 160ms ease;
+  pointer-events: none;
+}
+
+.corner-tri::after {
+  content: "";
+  position: absolute;
+  width: 0;
+  height: 0;
+}
+
+.credit-card:hover .corner-tri {
+  transform: translate(5px, 5px);
+}
+
+/* Top-left outlined triangle */
+.corner-tl {
+  top: -1px;
+  left: -1px;
+  border-right: var(--corner-size) solid var(--corner-color);
+  border-bottom: var(--corner-size) solid transparent;
+  transform-origin: top left;
+}
+.corner-tl::after {
+  top: 1px;
+  left: 1px;
+  border-right: calc(var(--corner-size) - var(--corner-inset)) solid #ffffff;
+  border-bottom: calc(var(--corner-size) - var(--corner-inset)) solid transparent;
+}
+
+/* Top-right outlined triangle */
+.corner-tr {
+  top: -1px;
+  right: -1px;
+  border-left: var(--corner-size) solid var(--corner-color);
+  border-bottom: var(--corner-size) solid transparent;
+  transform-origin: top right;
+}
+.corner-tr::after {
+  top: 1px;
+  right: 1px;
+  border-left: calc(var(--corner-size) - var(--corner-inset)) solid #ffffff;
+  border-bottom: calc(var(--corner-size) - var(--corner-inset)) solid transparent;
+}
+
+/* Bottom-right outlined triangle */
+.corner-br {
+  bottom: -1px;
+  right: -1px;
+  border-left: var(--corner-size) solid var(--corner-color);
+  border-top: var(--corner-size) solid transparent;
+  transform-origin: bottom right;
+}
+.corner-br::after {
+  bottom: 1px;
+  right: 1px;
+  border-left: calc(var(--corner-size) - var(--corner-inset)) solid #ffffff;
+  border-top: calc(var(--corner-size) - var(--corner-inset)) solid transparent;
+}
+
+/* Bottom-left outlined triangle */
+.corner-bl {
+  bottom: -1px;
+  left: -1px;
+  border-right: var(--corner-size) solid var(--corner-color);
+  border-top: var(--corner-size) solid transparent;
+  transform-origin: bottom left;
+}
+.corner-bl::after {
+  bottom: 1px;
+  left: 1px;
+  border-right: calc(var(--corner-size) - var(--corner-inset)) solid #ffffff;
+  border-top: calc(var(--corner-size) - var(--corner-inset)) solid transparent;
+}
+
+

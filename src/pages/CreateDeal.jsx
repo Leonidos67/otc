@@ -1,6 +1,9 @@
 import React, { useState } from 'react';
+import { tonConnect } from '../utils/ton/tonConnect';
 import { Link } from 'react-router-dom';
 import './PageStyles.css';
+import { useTonWallet } from '@tonconnect/ui-react';
+import { gifts } from "../data/gifts";
 
 const CreateDeal = () => {
   return (
@@ -26,6 +29,8 @@ export default CreateDeal;
 const DealSteps = () => {
   const [step, setStep] = useState(1);
   const [method, setMethod] = useState(null);
+  const [gift, setGift] = useState(null);
+  const uiWallet = useTonWallet();
 
   return (
     <>
@@ -34,7 +39,7 @@ const DealSteps = () => {
           <div className="step-title">{`Шаг #${step}`}</div>
           <div className="progress">
             <div className="progress-track">
-              <div className="progress-fill" style={{ width: `${(step / 3) * 100}%` }} />
+              <div className="progress-fill" style={{ width: `${(step / 4) * 100}%` }} />
             </div>
           </div>
         </div>
@@ -59,6 +64,10 @@ const DealSteps = () => {
         )}
 
         {step === 3 && (
+          <GiftSelection gift={gift} onChange={(value) => setGift(value)} />
+        )}
+
+        {step === 4 && (
           <div style={{ margin: 0 }}>
             <h3 className="profile-page-title" style={{ marginBottom: 8 }}>Условия</h3>
             <div className="input-group">
@@ -95,25 +104,28 @@ const DealSteps = () => {
             type="button"
             className="arrow-btn"
             onClick={() => {
-              // Валидация: если метод не настроен
+              // Проверки
               if (step === 2) {
                 const card = localStorage.getItem('payment_card_number') || '';
-                const wallet = localStorage.getItem('wallet_connected') === 'true';
+                const walletAddr = (localStorage.getItem('wallet_address') || '').trim();
+                const uiConnected = Boolean(uiWallet && uiWallet.account && uiWallet.account.address);
+                const sdkConnected = Boolean(tonConnect && tonConnect.account && tonConnect.account.address);
+                const wallet = Boolean(walletAddr) || uiConnected || sdkConnected;
                 if (method === 'На карту' && !card.trim()) {
                   const go = window.confirm('Для приёма на карту необходимо привязать карту. Перейти в профиль для добавления реквизитов?');
                   if (go) window.location.href = '/profile?tab=payments';
                   return;
                 }
-                if (method === 'TON-Кошелек' && !wallet) {
+                if (method === 'TON-кошелек' && !wallet) {
                   const go = window.confirm('Для приёма на TON-кошелёк необходимо подключить кошелёк. Перейти в профиль для подключения?');
                   if (go) window.location.href = '/profile?tab=payments';
                   return;
                 }
               }
-              setStep((s) => Math.min(3, s + 1));
+              setStep((s) => Math.min(4, s + 1));
             }}
             aria-label="Дальше"
-            disabled={step === 3}
+            disabled={step === 4}
           >
             Дальше
             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -122,16 +134,15 @@ const DealSteps = () => {
           </button>
         </div>
       )}
-
-      {/* Навигационные кнопки убраны по требованию */}
     </>
   );
 };
 
 const MethodSelection = ({ method, onChange }) => {
   const [error, setError] = useState("");
+  const uiWallet = useTonWallet();
   const options = [
-    { key: 'TON-Кошелек', label: 'TON-Кошелек' },
+    { key: 'TON-кошелек', label: 'TON-кошелек' },
     { key: 'На карту', label: 'На карту' },
     { key: 'Звезды', label: 'Звезды' },
   ];
@@ -149,16 +160,26 @@ const MethodSelection = ({ method, onChange }) => {
               if (opt.key === 'На карту') {
                 const card = localStorage.getItem('payment_card_number') || '';
                 if (!card.trim()) {
-                  setError('Для приёма на карту необходимо привязать карту в профиле.');
+                  setError(
+                    <>
+                      Для приёма на карту необходимо <a href="/profile?tab=payments" style={{ color: 'inherit', textDecoration: 'underline' }}>привязать карту</a> в профиле.
+                    </>
+                  );
                   return;
                 }
               }
-              if (opt.key === 'TON-Кошелек') {
-                const wallet = localStorage.getItem('wallet_connected') === 'true';
+              if (opt.key === 'TON-кошелек') {
+                const walletAddr = (localStorage.getItem('wallet_address') || '').trim();
+                const uiConnected = Boolean(uiWallet && uiWallet.account && uiWallet.account.address);
+                const sdkConnected = Boolean(tonConnect && tonConnect.account && tonConnect.account.address);
+                const wallet = Boolean(walletAddr) || uiConnected || sdkConnected;
                 if (!wallet) {
-                  // Открыть TonConnect UI через кнопку на странице профиля невозможно отсюда,
-                  // поэтому просто перенаправим пользователя в профиль.
-                  setError('Подключите TON-кошелёк в профиле через кнопку Connect Wallet.');
+                  setError(
+                    <>
+                      <a href="/profile?tab=payments" style={{ color: 'inherit', textDecoration: 'underline' }}>Подключите</a>
+                      {" "}TON-кошелёк в профиле через кнопку Connect Wallet.
+                    </>
+                  );
                   return;
                 }
               }
@@ -175,4 +196,75 @@ const MethodSelection = ({ method, onChange }) => {
   );
 };
 
+const GiftSelection = ({ gift, onChange }) => {
+  const [search, setSearch] = useState("");
 
+  const filteredGifts = gifts.filter((g) =>
+    g.title.toLowerCase().includes(search.toLowerCase())
+  );
+
+  return (
+    <div>
+      <h3 className="profile-page-title" style={{ marginBottom: 8 }}>
+        Выберите NFT подарок:
+      </h3>
+
+      {/* Поиск */}
+      <input
+        type="text"
+        placeholder="Поиск по подаркам..."
+        value={search}
+        onChange={(e) => setSearch(e.target.value)}
+        style={{
+          width: "100%",
+          marginBottom: 12,
+          padding: "12px 14px", // 👈 выше за счёт увеличенного паддинга
+          borderRadius: 8,
+          border: "1px solid #333",
+          background: "#000",
+          fontSize: 16, // 👈 текст немного больше
+          color: "#fff" // 👈 чтобы текст был читаемым на чёрном фоне
+        }}
+      />
+
+      
+      {/* Сетка подарков */}
+      <div className="gift-grid" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(120px, 1fr))", gap: 16 }}>
+        {filteredGifts.map((g) => (
+          <div
+            key={g.id}
+            className="gift-card"
+            style={{
+              position: "relative",
+              background: "#000",
+              borderRadius: 12,
+              padding: 12,
+              textAlign: "center",
+              cursor: "pointer",
+              boxShadow: gift === g.id ? "0 0 0 2px #333 inset" : "0 0 0 1px #000 inset"
+            }}
+            onClick={() => onChange(g.id)}
+          >
+            {/* Картинка */}
+            <img
+              src={g.img}
+              alt={g.title}
+              style={{ width: 80, height: 80, borderRadius: 8, marginBottom: 8 }}
+            />
+            {/* Название */}
+            <div>{g.title}</div>
+
+            {/* Галочка при выборе */}
+            {gift === g.id && (
+              <div style={{ position: "absolute", top: 8, right: 8, background: "#fff", borderRadius: "50%" }}>
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="black" viewBox="0 0 24 24">
+                  <path d="M20.285 6.709l-11.285 11.291-5.285-5.291 1.414-1.414 3.871 3.877 9.871-9.877z"/>
+                </svg>
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};

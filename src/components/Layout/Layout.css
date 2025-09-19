@@ -1,6 +1,13 @@
+/* Restrict page scroll to content area */
+html, body {
+  height: 100%;
+  overflow: hidden;
+}
+
 .layout {
   display: flex;
-  min-height: 100vh;
+  height: 100vh;
+  overflow: hidden;
   background-color: #000000;
 }
 
@@ -17,9 +24,31 @@
   border-radius: 12px;
   padding: 20px;
   border: 1px solid #333333;
-  min-height: calc(100vh - 20px);
+  height: calc(100vh - 20px);
+  overflow: auto; /* only content scrolls */
   margin-left: 250px; /* Точная ширина сайдбара */
   width: calc(100% - 270px); /* 250px сайдбар + 20px отступов */
+  /* Dark scrollbar for content (Firefox) */
+  scrollbar-color: #2a2a2a #0d0d0d;
+  scrollbar-width: thin;
+}
+
+/* Dark scrollbar for content (WebKit) */
+.content::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+.content::-webkit-scrollbar-track {
+  background: #0d0d0d;
+  border-radius: 8px;
+}
+.content::-webkit-scrollbar-thumb {
+  background: #2a2a2a;
+  border-radius: 8px;
+  border: 1px solid #333;
+}
+.content::-webkit-scrollbar-thumb:hover {
+  background: #343434;
 }
 
 .mobile-menu-toggle {
@@ -54,7 +83,8 @@
     padding: 20px !important; /* внутренние отступы как на ПК */
     border-radius: 12px !important;
     border: 1px solid #333333 !important; /* обводка */
-    min-height: calc(100vh - 20px); /* учитываем только padding .layout */
+    height: calc(100vh - 20px); /* учитываем только padding .layout */
+    overflow: auto; /* only content scrolls */
     padding-bottom: var(--mobile-nav-height) !important; /* отступ под нижнее меню */
     box-sizing: border-box;
   }
