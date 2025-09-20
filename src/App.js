@@ -5,6 +5,10 @@ import Layout from './components/Layout/Layout';
 import Home from './pages/Home';
 import Deals from './pages/Deals';
 import CreateDeal from './pages/CreateDeal';
+import DealView from './pages/DealView';
+import PublicDealView from './pages/PublicDealView';
+import AvailableDeals from './pages/AvailableDeals';
+import DealDemo from './pages/DealDemo';
 import Profile from './pages/Profile';
 import SecurityPasscode from './pages/SecurityPasscode';
 import Login from './pages/Login';
@@ -47,6 +51,32 @@ function AppContent() {
         <ProtectedRoute>
           <Layout>
             <CreateDeal />
+          </Layout>
+        </ProtectedRoute>
+      } />
+      <Route path="/deals/:dealId" element={
+        <ProtectedRoute>
+          <Layout>
+            <DealView />
+          </Layout>
+        </ProtectedRoute>
+      } />
+      <Route path="/deals/available" element={
+        <ProtectedRoute>
+          <Layout>
+            <AvailableDeals />
+          </Layout>
+        </ProtectedRoute>
+      } />
+      <Route path="/deal/:dealId" element={
+        <Layout>
+          <PublicDealView />
+        </Layout>
+      } />
+      <Route path="/demo" element={
+        <ProtectedRoute>
+          <Layout>
+            <DealDemo />
           </Layout>
         </ProtectedRoute>
       } />

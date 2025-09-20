@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import { tonConnect } from '../utils/ton/tonConnect';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import './PageStyles.css';
 import { useTonWallet } from '@tonconnect/ui-react';
 import { gifts } from "../data/gifts";
+import { saveDeal, createPublicDealUrl } from '../utils/dealUtils';
 
 const CreateDeal = () => {
   return (
@@ -33,7 +34,9 @@ const DealSteps = () => {
   const [method, setMethod] = useState(null);
   const [gifts, setGifts] = useState([]); // Массив выбранных подарков
   const [amount, setAmount] = useState(''); // Сумма сделки
+  const [createdDealId, setCreatedDealId] = useState(null); // ID созданной сделки
   const uiWallet = useTonWallet();
+  const navigate = useNavigate();
 
   // Функция валидации для каждого шага
   const isStepValid = (stepNumber) => {
@@ -47,6 +50,40 @@ const DealSteps = () => {
       default:
         return false;
     }
+  };
+
+  // Функция создания сделки
+  const createDeal = () => {
+    const dealData = {
+      method,
+      amount: parseFloat(amount),
+      gifts: gifts.map(giftId => {
+        const gift = gifts.find(g => g.id === giftId);
+        return gift ? { id: gift.id, title: gift.title, img: gift.img } : null;
+      }).filter(Boolean),
+      userId: localStorage.getItem('user_id') || 'anonymous',
+      creatorId: localStorage.getItem('user_id') || 'anonymous',
+      status: 'waiting_for_participant', // Новый статус
+      participants: {
+        creator: {
+          id: localStorage.getItem('user_id') || 'anonymous',
+          confirmed: false,
+          ready: false
+        },
+        participant: null
+      }
+    };
+
+    console.log('Создание сделки с данными:', dealData);
+    const dealId = saveDeal(dealData);
+    console.log('Создана сделка с ID:', dealId);
+    
+    // Проверяем, что сделка действительно сохранилась
+    const savedDeals = JSON.parse(localStorage.getItem('deals') || '[]');
+    console.log('Все сохраненные сделки:', savedDeals);
+    
+    setCreatedDealId(dealId);
+    return dealId;
   };
 
   return (
@@ -78,63 +115,87 @@ const DealSteps = () => {
           )}
 
           {step === 3 && (
-            <div style={{ margin: 0, padding: '40px 0 0 0' }}>
+            <div style={{ margin: 0, padding: '20px 0 0 0' }}>
               <div className="success-blocks-container">
-                {/* Первый блок - Успех */}
+
+                {/* Первый блок - Успех (во всю ширину) */}
                 <div className="success-block">
                   <div className="success-icon green">
                     ✓
                   </div>
-                  <h3 className="success-title green">
+                  <h3 className="success-title">
                     Сделка успешно создана!
                   </h3>
-                  <p className="success-description">
-                    Ваша сделка была создана и опубликована. Теперь другие пользователи смогут найти её и совершить обмен.
-                  </p>
                 </div>
 
-                {/* Второй блок - Детали сделки */}
-                <div className="success-block">
-                  <div className="success-icon blue">
-                    📋
+                {/* Второй ряд - два блока в ряд */}
+                <div className="success-blocks-row">
+                  {/* Второй блок - Детали сделки */}
+                  <div className="success-block">
+                    <div>
+                      <div className="success-icon blue">
+                        📋
+                      </div>
+                      <h3 className="success-title">
+                        Детали сделки
+                      </h3>
+                    </div>
+                    <div className="details-container">
+                      <div className="details-item">
+                        <span className="details-label">Метод оплаты:</span>
+                        <span className="details-value">{method}</span>
+                      </div>
+                      <div className="details-item">
+                        <span className="details-label">Сумма:</span>
+                        <span className="details-value">{amount}</span>
+                      </div>
+                      <div className="details-item">
+                        <span className="details-label">Подарков:</span>
+                        <span className="details-value">{gifts.length}</span>
+                      </div>
+                    </div>
                   </div>
-                  <h3 className="success-title blue">
-                    Детали сделки
-                  </h3>
-                  <div className="details-container">
-                    <div className="details-item">
-                      <span className="details-label">Метод оплаты:</span><br/>
-                      <span className="details-value">{method}</span>
+
+                  {/* Третий блок - Страница сделки */}
+                  <div className="success-block">
+                    <div>
+                      <div className="success-icon purple">
+                        🔗
+                      </div>
+                      <h3 className="success-title">
+                        Страница сделки
+                      </h3>
                     </div>
-                    <div className="details-item">
-                      <span className="details-label">Сумма:</span><br/>
-                      <span className="details-value">{amount}</span>
-                    </div>
-                    <div className="details-item">
-                      <span className="details-label">Подарков:</span><br/>
-                      <span className="details-value">{gifts.length}</span>
-                    </div>
+                    <p className="success-description">
+                      Перейдите к списку всех сделок, чтобы управлять своими предложениями и просматривать активные обмены.
+                    </p>
+                    <button
+                      onClick={() => {
+                        if (createdDealId) {
+                          const dealUrl = createPublicDealUrl(createdDealId);
+                          navigator.clipboard.writeText(dealUrl).then(() => {
+                            alert('Публичная ссылка на сделку скопирована в буфер обмена!\n\nТеперь вы можете поделиться этой ссылкой с любым пользователем, и он сможет присоединиться к сделке на любом устройстве!');
+                          }).catch(() => {
+                            // Fallback для старых браузеров
+                            const textArea = document.createElement('textarea');
+                            textArea.value = dealUrl;
+                            document.body.appendChild(textArea);
+                            textArea.select();
+                            document.execCommand('copy');
+                            document.body.removeChild(textArea);
+                            alert('Публичная ссылка на сделку скопирована в буфер обмена!\n\nТеперь вы можете поделиться этой ссылкой с любым пользователем, и он сможет присоединиться к сделке на любом устройстве!');
+                          });
+                        } else {
+                          window.location.href = '/deals';
+                        }
+                      }}
+                      className="success-button"
+                    >
+                      {createdDealId ? '📤 Поделиться сделкой' : 'Перейти к сделкам'}
+                    </button>
                   </div>
                 </div>
 
-                {/* Третий блок - Страница сделки */}
-                <div className="success-block">
-                  <div className="success-icon purple">
-                    🔗
-                  </div>
-                  <h3 className="success-title purple">
-                    Страница сделки
-                  </h3>
-                  <p className="success-description">
-                    Перейдите к списку всех сделок, чтобы управлять своими предложениями и просматривать активные обмены.
-                  </p>
-                  <button
-                    onClick={() => window.location.href = '/deals'}
-                    className="success-button"
-                  >
-                    Перейти к сделкам
-                  </button>
-                </div>
               </div>
             </div>
           )}
@@ -207,6 +268,12 @@ const DealSteps = () => {
                     return;
                   }
                 }
+                
+                // Если переходим к шагу 3, создаем сделку
+                if (step === 2) {
+                  createDeal();
+                }
+                
                 setStep((s) => Math.min(3, s + 1));
               }}
               aria-label="Дальше"

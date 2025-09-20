@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import './PageStyles.css';
 import Rocket from '../components/Icons/Rocket';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
+import { getActiveDeals, getCompletedDeals, formatDate } from '../utils/dealUtils';
 
 const Deals = () => {
   const [activeTab, setActiveTab] = useState('Активные сделки');
@@ -13,8 +14,26 @@ const Deals = () => {
   const menuRef = useRef(null);
   const indicatorRef = useRef(null);
 
+  // Загружаем сделки при монтировании компонента
+  useEffect(() => {
+    const loadDeals = () => {
+      setActiveDeals(getActiveDeals());
+      setHistoryDeals(getCompletedDeals());
+      // Черновики пока не реализованы
+      setDraftDeals([]);
+    };
+
+    loadDeals();
+    
+    // Обновляем сделки каждые 5 секунд
+    const interval = setInterval(loadDeals, 5000);
+    
+    return () => clearInterval(interval);
+  }, []);
+
   const menuItems = [
     'Активные сделки',
+    'Доступные сделки',
     'История сделок',
     'Черновики',
   ];
@@ -93,8 +112,55 @@ const Deals = () => {
                 <p>Создайте первую сделку, чтобы увидеть её здесь.</p>
               </div>
             ) : (
-              <div />
+              <div className="deals-list">
+                {activeDeals.map((deal) => (
+                  <div key={deal.id} className="deal-card">
+                    <div className="deal-card-header">
+                      <div className="deal-id">#{deal.id.split('_')[1]}</div>
+                      <div className={`deal-status ${deal.status}`}>
+                        {deal.status === 'waiting_for_participant' ? 'Ожидает участника' :
+                         deal.status === 'waiting_for_confirmation' ? 'Ожидает подтверждения' :
+                         deal.status === 'in_progress' ? 'В процессе' :
+                         deal.status === 'completed' ? 'Завершена' : 
+                         deal.status === 'cancelled' ? 'Отменена' : deal.status}
+                      </div>
+                    </div>
+                    <div className="deal-card-content">
+                      <div className="deal-info">
+                        <div className="deal-method">{deal.method}</div>
+                        <div className="deal-amount">{deal.amount}</div>
+                        <div className="deal-gifts-count">{deal.gifts.length} подарков</div>
+                      </div>
+                      <div className="deal-date">{formatDate(deal.createdAt)}</div>
+                    </div>
+                    <div className="deal-card-actions">
+                      <Link 
+                        to={`/deals/${deal.id}`}
+                        className="deal-view-button"
+                      >
+                        Просмотреть
+                      </Link>
+                    </div>
+                  </div>
+                ))}
+              </div>
             )}
+          </div>
+        )}
+
+        {activeTab === 'Доступные сделки' && (
+          <div className="content-box">
+            <div style={{ textAlign: 'center', padding: '40px 20px' }}>
+              <h3>Просмотр доступных сделок</h3>
+              <p>Здесь вы можете найти сделки других пользователей, к которым можно присоединиться.</p>
+              <button 
+                onClick={() => navigate('/deals/available')}
+                className="success-button"
+                style={{ marginTop: '20px' }}
+              >
+                Перейти к доступным сделкам
+              </button>
+            </div>
           </div>
         )}
 
@@ -106,7 +172,32 @@ const Deals = () => {
                 <p>Здесь появятся завершённые сделки.</p>
               </div>
             ) : (
-              <div />
+              <div className="deals-list">
+                {historyDeals.map((deal) => (
+                  <div key={deal.id} className="deal-card">
+                    <div className="deal-card-header">
+                      <div className="deal-id">#{deal.id.split('_')[1]}</div>
+                      <div className="deal-status completed">Завершена</div>
+                    </div>
+                    <div className="deal-card-content">
+                      <div className="deal-info">
+                        <div className="deal-method">{deal.method}</div>
+                        <div className="deal-amount">{deal.amount}</div>
+                        <div className="deal-gifts-count">{deal.gifts.length} подарков</div>
+                      </div>
+                      <div className="deal-date">{formatDate(deal.createdAt)}</div>
+                    </div>
+                    <div className="deal-card-actions">
+                      <Link 
+                        to={`/deals/${deal.id}`}
+                        className="deal-view-button"
+                      >
+                        Просмотреть
+                      </Link>
+                    </div>
+                  </div>
+                ))}
+              </div>
             )}
           </div>
         )}

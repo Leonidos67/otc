@@ -1005,20 +1005,56 @@ button.WalletConnectButton {
 
 /* Стили для трех блоков успешного создания сделки */
 .success-blocks-container {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  display: flex;
+  flex-direction: column;
   gap: 20px;
   width: 100%;
   margin: 0;
   padding: 0;
 }
 
+.success-blocks-row {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 20px;
+}
+
 .success-block {
-  background: #0d0d0d;
+  position: relative;
+  background: #000000;
   border: 1px solid #333;
   border-radius: 12px;
-  padding: 30px;
+  padding: 20px;
   text-align: center;
+  overflow: hidden;
+}
+
+.success-block::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background: radial-gradient(125% 125% at 50% 90%, #000000 40%, #0d1a36 100%);
+}
+
+.success-block > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* Первый блок - Emerald Void */
+.success-block:nth-child(1)::before {
+  background: radial-gradient(125% 125% at 50% 90%, #000000 40%, #072607 100%);
+}
+
+/* Второй блок - убираем градиентный фон */
+.success-block:nth-child(2)::before {
+  background: transparent;
+}
+
+/* Третий блок - убираем градиентный фон */
+.success-block:nth-child(3)::before {
+  background: transparent;
 }
 
 .success-icon {
@@ -1030,6 +1066,32 @@ button.WalletConnectButton {
   justify-content: center;
   margin: 0 auto 20px;
   font-size: 24px;
+}
+
+/* Стили для блоков с горизонтальным расположением иконки и заголовка */
+.success-block:nth-child(2) .success-icon,
+.success-block:nth-child(3) .success-icon {
+  margin: 0 0 0 0;
+  width: 40px;
+  height: 40px;
+  font-size: 18px;
+}
+
+.success-block:nth-child(2) .success-title,
+.success-block:nth-child(3) .success-title {
+  margin: 0 0 0 12px;
+  text-align: left;
+  display: flex;
+  align-items: center;
+  height: 40px;
+}
+
+/* Контейнер для иконки и заголовка */
+.success-block:nth-child(2) > div:first-child,
+.success-block:nth-child(3) > div:first-child {
+  display: flex;
+  align-items: center;
+  margin-bottom: 20px;
 }
 
 .success-icon.green { background: #4ade80; }
@@ -1058,22 +1120,42 @@ button.WalletConnectButton {
   border-radius: 8px;
   padding: 16px;
   text-align: left;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
 }
 
 .details-item {
-  margin-bottom: 8px;
+  flex: 1;
+  text-align: center;
   color: #ccc;
   font-size: 14px;
   line-height: 1.6;
+  position: relative;
+}
+
+.details-item:not(:last-child)::after {
+  content: '';
+  position: absolute;
+  right: -8px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 1px;
+  height: 30px;
+  background: #333;
 }
 
 .details-label {
   color: #fff;
   font-weight: 600;
+  display: block;
+  margin-bottom: 4px;
 }
 
 .details-value {
   color: #3b82f6;
+  font-weight: 500;
 }
 
 .success-button {
@@ -1093,12 +1175,17 @@ button.WalletConnectButton {
   border-color: #444;
 }
 
+
 /* Адаптивность для мобильных */
 @media (max-width: 768px) {
   .success-blocks-container {
-    grid-template-columns: 1fr;
     gap: 16px;
     padding: 0;
+  }
+  
+  .success-blocks-row {
+    grid-template-columns: 1fr;
+    gap: 16px;
   }
   
   .success-block {
@@ -1112,6 +1199,569 @@ button.WalletConnectButton {
     width: 50px;
     height: 50px;
     font-size: 20px;
+  }
+  
+  .details-container {
+    flex-direction: column;
+    gap: 12px;
+  }
+  
+  .details-item {
+    text-align: left;
+    width: 100%;
+  }
+  
+  .details-item:not(:last-child)::after {
+    display: none;
+  }
+  
+  .details-item:not(:last-child) {
+    border-bottom: 1px solid #333;
+    padding-bottom: 12px;
+  }
+}
+
+/* Стили для страницы просмотра сделки */
+.deal-view-container {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.deal-info-card,
+.deal-gifts-card,
+.deal-actions-card,
+.deal-participants-card {
+  background: #000000;
+  border: 1px solid #333;
+  border-radius: 12px;
+  padding: 24px;
+}
+
+.deal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #333;
+}
+
+.deal-status {
+  display: flex;
+  align-items: center;
+}
+
+.status-badge {
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.status-badge.active {
+  background: #4ade80;
+  color: #000;
+}
+
+.status-badge.completed {
+  background: #3b82f6;
+  color: #fff;
+}
+
+.status-badge.cancelled {
+  background: #ef4444;
+  color: #fff;
+}
+
+.status-badge.waiting_for_participant {
+  background: #f59e0b;
+  color: #000;
+}
+
+.status-badge.waiting_for_confirmation {
+  background: #3b82f6;
+  color: #fff;
+}
+
+.status-badge.in_progress {
+  background: #10b981;
+  color: #000;
+}
+
+.deal-date {
+  color: #ccc;
+  font-size: 14px;
+}
+
+.deal-details h2,
+.deal-gifts-card h2,
+.deal-actions-card h2,
+.deal-participants-card h2 {
+  margin: 0 0 16px 0;
+  color: #fff;
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.details-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+}
+
+.detail-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.detail-label {
+  color: #ccc;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.detail-value {
+  color: #fff;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.deal-id {
+  font-family: monospace;
+  background: #1a1a1a;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+}
+
+.gifts-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 16px;
+}
+
+.gift-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  background: #1a1a1a;
+  border: 1px solid #333;
+  border-radius: 8px;
+  padding: 12px;
+}
+
+.gift-image {
+  width: 60px;
+  height: 60px;
+  border-radius: 8px;
+  margin-bottom: 8px;
+  object-fit: cover;
+}
+
+.gift-title {
+  color: #fff;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.3;
+}
+
+.actions-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 12px;
+}
+
+.action-button {
+  padding: 12px 20px;
+  border-radius: 8px;
+  border: 1px solid #333;
+  background: #1a1a1a;
+  color: #fff;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.action-button:hover {
+  background: #2d2d2d;
+  border-color: #444;
+}
+
+.action-button.primary {
+  background: #3b82f6;
+  border-color: #3b82f6;
+}
+
+.action-button.primary:hover {
+  background: #2563eb;
+  border-color: #2563eb;
+}
+
+.action-button.secondary {
+  background: #6b7280;
+  border-color: #6b7280;
+}
+
+.action-button.secondary:hover {
+  background: #4b5563;
+  border-color: #4b5563;
+}
+
+.action-button.danger {
+  background: #ef4444;
+  border-color: #ef4444;
+}
+
+.action-button.danger:hover {
+  background: #dc2626;
+  border-color: #dc2626;
+}
+
+.action-button.success {
+  background: #10b981;
+  border-color: #10b981;
+}
+
+.action-button.success:hover {
+  background: #059669;
+  border-color: #059669;
+}
+
+.action-button.warning {
+  background: #f59e0b;
+  border-color: #f59e0b;
+}
+
+.action-button.warning:hover {
+  background: #d97706;
+  border-color: #d97706;
+}
+
+.action-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.action-button:disabled:hover {
+  background: #1a1a1a;
+  border-color: #333;
+}
+
+/* Стили для участников сделки */
+.participants-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.participant-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px;
+  background: #1a1a1a;
+  border: 1px solid #333;
+  border-radius: 8px;
+}
+
+.participant-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.participant-role {
+  color: #fff;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.participant-id {
+  color: #ccc;
+  font-size: 12px;
+  font-family: monospace;
+}
+
+.participant-status {
+  display: flex;
+  align-items: center;
+}
+
+.readiness-badge {
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.readiness-badge.ready {
+  background: #10b981;
+  color: #000;
+}
+
+.readiness-badge.not-ready {
+  background: #6b7280;
+  color: #fff;
+}
+
+.readiness-badge.waiting {
+  background: #f59e0b;
+  color: #000;
+}
+
+/* Стили для информационного баннера пользователя */
+.user-info-banner {
+  background: #1a1a1a;
+  border: 1px solid #333;
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #ccc;
+  font-size: 14px;
+}
+
+.user-info code {
+  background: #000;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-family: monospace;
+  font-size: 12px;
+  color: #3b82f6;
+}
+
+.user-role {
+  display: flex;
+  align-items: center;
+}
+
+.role-badge {
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.role-badge.creator {
+  background: #3b82f6;
+  color: #fff;
+}
+
+.role-badge.participant {
+  background: #10b981;
+  color: #000;
+}
+
+.role-badge.guest {
+  background: #6b7280;
+  color: #fff;
+}
+
+/* Адаптивность для мобильных */
+@media (max-width: 768px) {
+  .deal-view-container {
+    gap: 16px;
+  }
+  
+  .deal-info-card,
+  .deal-gifts-card,
+  .deal-actions-card {
+    padding: 16px;
+  }
+  
+  .deal-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  
+  .details-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .gifts-grid {
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    gap: 12px;
+  }
+  
+  .actions-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Стили для списка сделок */
+.deals-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.deal-card {
+  background: #000000;
+  border: 1px solid #333;
+  border-radius: 12px;
+  padding: 20px;
+  transition: all 0.2s ease;
+}
+
+.deal-card:hover {
+  border-color: #444;
+  background: #0a0a0a;
+}
+
+.deal-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.deal-id {
+  font-family: monospace;
+  background: #1a1a1a;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  color: #ccc;
+}
+
+.deal-status {
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.deal-status.active {
+  background: #4ade80;
+  color: #000;
+}
+
+.deal-status.completed {
+  background: #3b82f6;
+  color: #fff;
+}
+
+.deal-status.waiting_for_participant {
+  background: #f59e0b;
+  color: #000;
+}
+
+.deal-status.waiting_for_confirmation {
+  background: #3b82f6;
+  color: #fff;
+}
+
+.deal-status.in_progress {
+  background: #10b981;
+  color: #000;
+}
+
+.deal-card-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 16px;
+}
+
+.deal-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.deal-method {
+  color: #fff;
+  font-weight: 600;
+  font-size: 16px;
+}
+
+.deal-amount {
+  color: #3b82f6;
+  font-weight: 600;
+  font-size: 18px;
+}
+
+.deal-gifts-count {
+  color: #ccc;
+  font-size: 14px;
+}
+
+.deal-date {
+  color: #666;
+  font-size: 12px;
+  text-align: right;
+}
+
+.deal-card-actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.deal-view-button {
+  background: #3b82f6;
+  color: #fff;
+  padding: 8px 16px;
+  border-radius: 6px;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 14px;
+  transition: all 0.2s ease;
+  border: none;
+  cursor: pointer;
+}
+
+.deal-view-button:hover {
+  background: #2563eb;
+  color: #fff;
+  text-decoration: none;
+}
+
+/* Адаптивность для мобильных */
+@media (max-width: 768px) {
+  .deal-card {
+    padding: 16px;
+  }
+  
+  .deal-card-content {
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .deal-date {
+    text-align: left;
+  }
+  
+  .deal-card-actions {
+    justify-content: stretch;
+  }
+  
+  .deal-view-button {
+    width: 100%;
+    text-align: center;
   }
 }
 
