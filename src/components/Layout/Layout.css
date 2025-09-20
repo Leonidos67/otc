@@ -76,6 +76,9 @@ html, body {
     padding: 10px; /* отступы по краям на черном фоне */
     padding-bottom: calc(10px + var(--mobile-nav-height) + 10px); /* место под меню + внешний отступ снизу */
     box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh; /* минимальная высота во весь экран */
   }
   .layout .content {
     margin: 0 !important; /* контент без внешних отступов, отступы дает .layout */
@@ -83,11 +86,14 @@ html, body {
     padding: 20px !important; /* внутренние отступы как на ПК */
     border-radius: 12px !important;
     border: 1px solid #333333 !important; /* обводка */
-    height: calc(100vh - 20px); /* учитываем только padding .layout */
-    overflow: auto; /* only content scrolls */
-    padding-bottom: var(--mobile-nav-height) !important; /* отступ под нижнее меню */
+    height: auto !important; /* убираем фиксированную высоту */
+    flex: 1; /* занимает доступное пространство */
+    overflow: auto; /* контент прокручивается */
+    padding-bottom: 20px !important; /* обычный отступ снизу */
     box-sizing: border-box;
   }
+  
+  
   /* Жёстко переопределяем правило свернутого сайдбара на мобилках */
   .layout.sidebar-closed .content {
     margin: 0 !important;
