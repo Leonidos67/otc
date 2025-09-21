@@ -55,8 +55,8 @@ const UserGifts = () => {
         return;
       }
 
-      // В продакшене используем реальный API для получения подарков с сайта
-      const response = await fetch(`${apiUrl}/get-site-gifts`, {
+      // В продакшене используем реальный API для получения подарков из Telegram Gifts
+      const response = await fetch(`${apiUrl}/get-telegram-gifts`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -180,7 +180,7 @@ const UserGifts = () => {
       </div>
       
       <div className="demo-notice">
-        <p>🎁 Демо-режим: отображаются тестовые подарки с платформы OTC</p>
+        <p>🎁 Демо-режим: отображаются тестовые подарки из Telegram Gifts API</p>
       </div>
       
       {gifts.length === 0 ? (
@@ -212,12 +212,27 @@ const UserGifts = () => {
                 </p>
                 {gift.stars && (
                   <p className="gift-stars">
-                    {gift.converted ? `Конвертирован в ${gift.stars} ⭐` : `Стоимость: ${gift.stars} ⭐`}
+                    {gift.converted ? `Конвертирован в ${gift.convert_stars || gift.stars} ⭐` : `Стоимость: ${gift.stars} ⭐`}
+                  </p>
+                )}
+                {gift.limited && (
+                  <p className="gift-limited">
+                    🔥 Ограниченный выпуск
+                  </p>
+                )}
+                {gift.availability_remains && gift.availability_total && (
+                  <p className="gift-availability">
+                    Осталось: {gift.availability_remains}/{gift.availability_total}
                   </p>
                 )}
                 {gift.message && (
                   <p className="gift-message">
                     "{gift.message}"
+                  </p>
+                )}
+                {gift.source === 'telegram' && (
+                  <p className="gift-source">
+                    📱 Из Telegram
                   </p>
                 )}
               </div>

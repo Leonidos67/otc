@@ -241,6 +241,30 @@
   text-overflow: ellipsis;
 }
 
+.gift-limited {
+  font-size: 10px;
+  color: #ff6b6b;
+  margin: 2px 0 0 0;
+  line-height: 1.2;
+  font-weight: 600;
+}
+
+.gift-availability {
+  font-size: 10px;
+  color: #4CAF50;
+  margin: 2px 0 0 0;
+  line-height: 1.2;
+  font-weight: 500;
+}
+
+.gift-source {
+  font-size: 10px;
+  color: #2196F3;
+  margin: 2px 0 0 0;
+  line-height: 1.2;
+  font-weight: 500;
+}
+
 /* Адаптивность для мобильных устройств */
 @media (max-width: 768px) {
   .gifts-grid {
