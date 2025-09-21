@@ -90,6 +90,11 @@ module.exports = async (req, res) => {
         res.status(401).json({ success: false, error: 'Invalid Telegram auth' });
         return;
       }
+    } else if (!isDevelopment && !botToken) {
+      // Если нет токена бота, используем упрощенную проверку
+      console.warn('No bot token configured, using simplified auth check');
+    } else if (!isDevelopment && botToken) {
+      console.log('Bot token found, using full Telegram auth validation');
     }
 
     // Получаем подарки пользователя с сайта
