@@ -201,16 +201,21 @@ module.exports = async (req, res) => {
 
     // Проверяем авторизацию пользователя
     const isDevelopment = process.env.NODE_ENV === 'development';
-    if (!isDevelopment && botToken) {
+    const isProduction = process.env.NODE_ENV === 'production';
+    
+    if (isProduction && botToken) {
       const valid = isTelegramAuthValid(userData, botToken);
       if (!valid) {
         res.status(401).json({ success: false, error: 'Invalid Telegram auth' });
         return;
       }
-    } else if (!isDevelopment && !botToken) {
-      console.warn('No bot token configured, using simplified auth check for telegram gifts');
-    } else if (!isDevelopment && botToken) {
-      console.log('Bot token found, using full Telegram auth validation for telegram gifts');
+      console.log('Production mode: using full Telegram auth validation for telegram gifts');
+    } else if (isProduction && !botToken) {
+      console.warn('Production mode: No bot token configured, using simplified auth check for telegram gifts');
+    } else if (isDevelopment) {
+      console.log('Development mode: using demo Telegram Gifts data');
+    } else {
+      console.log('Unknown environment, using demo Telegram Gifts data');
     }
 
     // Получаем подарки пользователя из Telegram Gifts API

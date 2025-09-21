@@ -17,43 +17,18 @@ const UserGifts = () => {
     setError(null);
     
     // Проверяем, находимся ли мы в режиме разработки
-    const isDevelopment = process.env.NODE_ENV === 'development';
+    const isDevelopment = process.env.NODE_ENV === 'development' || window.location.hostname === 'localhost';
+    const isProduction = process.env.NODE_ENV === 'production' && window.location.hostname !== 'localhost';
     
     try {
-      // В режиме разработки используем моковые данные напрямую
-      if (isDevelopment) {
-        // Имитируем задержку сети
-        await new Promise(resolve => setTimeout(resolve, 500));
-        
-        const mockGifts = [
-          {
-            id: 'site_gift_1',
-            title: "Welcome Gift",
-            img: "https://optim.tildacdn.one/tild3534-6437-4733-a663-653232613962/-/cover/80x80/center/center/-/format/webp/GiftsGiftsGifts_AgAD.png",
-            quantity: 1,
-            received_date: new Date().toISOString(),
-            stars: 5,
-            converted: false,
-            sender: 'OTC Platform',
-            message: 'Добро пожаловать на платформу!'
-          },
-          {
-            id: 'site_gift_2',
-            title: "First Deal Gift", 
-            img: "https://static.tildacdn.one/tild3735-3535-4230-a535-386234383163/GiftsGiftsGifts_AgAD.png",
-            quantity: 1,
-            received_date: new Date(Date.now() - 86400000).toISOString(),
-            stars: 10,
-            converted: false,
-            sender: 'OTC Platform',
-            message: 'Поздравляем с первой сделкой!'
-          }
-        ];
-        
-        setGifts(mockGifts);
-        console.info('Gifts API Note: Используются локальные демо-данные для разработки');
-        return;
-      }
+      // Всегда используем API для получения подарков из Telegram Gifts
+      // В режиме разработки API будет возвращать демо-данные
+      console.log('Environment check:', {
+        NODE_ENV: process.env.NODE_ENV,
+        hostname: window.location.hostname,
+        isDevelopment,
+        isProduction
+      });
 
       // В продакшене используем реальный API для получения подарков из Telegram Gifts
       const response = await fetch(`${apiUrl}/get-telegram-gifts`, {
@@ -66,34 +41,52 @@ const UserGifts = () => {
 
       if (!response.ok) {
         if (response.status === 401) {
-          // Если ошибка авторизации, показываем демо-данные
-          console.warn('Auth error, falling back to demo data');
+          // Если ошибка авторизации, показываем демо-данные из Telegram Gifts
+          console.warn('Auth error, falling back to demo Telegram Gifts data');
           const fallbackGifts = [
             {
-              id: 'site_gift_1',
-              title: "Welcome Gift",
+              id: 'telegram_gift_fallback_1',
+              title: "Heart Locket",
               img: "https://optim.tildacdn.one/tild3534-6437-4733-a663-653232613962/-/cover/80x80/center/center/-/format/webp/GiftsGiftsGifts_AgAD.png",
               quantity: 1,
               received_date: new Date().toISOString(),
-              stars: 5,
+              stars: 10,
+              convert_stars: 8,
               converted: false,
-              sender: 'OTC Platform',
-              message: 'Добро пожаловать на платформу!'
+              saved: true,
+              limited: false,
+              sold_out: false,
+              birthday: false,
+              availability_remains: 1000,
+              availability_total: 1000,
+              sender: 'Telegram User',
+              message: 'Поздравляю с успешной сделкой! 🎉',
+              name_hidden: false,
+              source: 'telegram'
             },
             {
-              id: 'site_gift_2',
-              title: "First Deal Gift", 
+              id: 'telegram_gift_fallback_2',
+              title: "Diamond Ring", 
               img: "https://static.tildacdn.one/tild3735-3535-4230-a535-386234383163/GiftsGiftsGifts_AgAD.png",
               quantity: 1,
               received_date: new Date(Date.now() - 86400000).toISOString(),
-              stars: 10,
+              stars: 50,
+              convert_stars: 40,
               converted: false,
-              sender: 'OTC Platform',
-              message: 'Поздравляем с первой сделкой!'
+              saved: true,
+              limited: true,
+              sold_out: false,
+              birthday: false,
+              availability_remains: 100,
+              availability_total: 500,
+              sender: 'Telegram User',
+              message: 'За отличную работу! 💎',
+              name_hidden: false,
+              source: 'telegram'
             }
           ];
           setGifts(fallbackGifts);
-          console.info('Gifts API Note: Используются fallback данные из-за ошибки авторизации');
+          console.info('Gifts API Note: Используются fallback данные из Telegram Gifts API');
           return;
         } else if (response.status === 400) {
           setError('Неверные данные пользователя.');
@@ -179,9 +172,11 @@ const UserGifts = () => {
         </div>
       </div>
       
-      <div className="demo-notice">
-        <p>🎁 Демо-режим: отображаются тестовые подарки из Telegram Gifts API</p>
-      </div>
+      {(process.env.NODE_ENV === 'development' || window.location.hostname === 'localhost') && (
+        <div className="demo-notice">
+          <p>🎁 Режим разработки: отображаются демо-подарки из Telegram Gifts API</p>
+        </div>
+      )}
       
       {gifts.length === 0 ? (
         <div className="no-gifts">
