@@ -420,7 +420,8 @@ const GiftSelection = ({ selectedGifts, onChange }) => {
         onChange={(e) => setSearch(e.target.value)}
         style={{
           width: "100%",
-          marginBottom: 20,
+          marginBottom: 15,
+          marginTop: 15,
           padding: "12px 14px",
           borderRadius: 8,
           border: "1px solid #333",

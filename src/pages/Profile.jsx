@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import ChevronRight from "../components/Icons/ChevronRight";
 import WalletConnectButton from "../components/WalletConnectButton";
 import CreditCard from "../components/CreditCard/CreditCard";
+import UserGifts from "../components/UserGifts/UserGifts";
 import { useAuth } from "../contexts/AuthContext";
 import { useLocation } from "react-router-dom";
 import "./PageStyles.css";
@@ -52,6 +53,7 @@ const Profile = () => {
               <label>ID</label>
               <input type="text" value={user?.id || ""} readOnly />
             </div>
+            <UserGifts />
           </>
         );
       case "Способы оплаты/приема платежей":
