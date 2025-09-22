@@ -6,7 +6,7 @@ import './PageStyles.css';
 import './Login.css';
 
 const Login = () => {
-  const { login } = useAuth();
+  const { login, continueAsGuest } = useAuth();
   const navigate = useNavigate();
   const [autoAuthInProgress, setAutoAuthInProgress] = useState(true);
 
@@ -17,6 +17,11 @@ const Login = () => {
     } catch (e) {
       console.error('Ошибка входа через Telegram:', e);
     }
+  };
+
+  const handleContinueAsGuest = () => {
+    continueAsGuest();
+    navigate('/');
   };
 
   // Автовход в Telegram Mini App: если открыто внутри Telegram, не показываем форму
@@ -66,9 +71,17 @@ const Login = () => {
   return (
     <div className="login-container">
       <div className="content-box">
-        <h1>Вход через Telegram</h1>
-        <p>Для продолжения войдите через свой Telegram аккаунт</p>
+        <h1>GAMP OTC</h1>
         <TelegramAuth onAuth={handleTelegramAuth} />
+        <div className="login-divider">
+          <span>или</span>
+        </div>
+        <button 
+          className="continue-guest-button" 
+          onClick={handleContinueAsGuest}
+        >
+          Продолжить без входа
+        </button>
       </div>
     </div>
   );

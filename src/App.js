@@ -8,7 +8,6 @@ import CreateDeal from './pages/CreateDeal';
 import DealView from './pages/DealView';
 import PublicDealView from './pages/PublicDealView';
 import AvailableDeals from './pages/AvailableDeals';
-import DealDemo from './pages/DealDemo';
 import Profile from './pages/Profile';
 import SecurityPasscode from './pages/SecurityPasscode';
 import Login from './pages/Login';
@@ -16,13 +15,13 @@ import './App.css';
 
 // Protected Route component
 const ProtectedRoute = ({ children }) => {
-  const { isAuthenticated, loading } = useAuth();
+  const { isAuthenticated, guestMode, loading } = useAuth();
   
   if (loading) {
     return <div className="loading">Загрузка...</div>;
   }
   
-  return isAuthenticated ? children : <Navigate to="/login" />;
+  return (isAuthenticated || guestMode) ? children : <Navigate to="/login" />;
 };
 
 function AppContent() {
@@ -72,13 +71,6 @@ function AppContent() {
         <Layout>
           <PublicDealView />
         </Layout>
-      } />
-      <Route path="/demo" element={
-        <ProtectedRoute>
-          <Layout>
-            <DealDemo />
-          </Layout>
-        </ProtectedRoute>
       } />
       <Route path="/profile" element={
         <ProtectedRoute>

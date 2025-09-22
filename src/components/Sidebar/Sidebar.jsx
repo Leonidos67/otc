@@ -21,7 +21,6 @@ const Sidebar = ({ isOpen = true, onToggle }) => {
   const menuItems = [
     { path: '/', label: 'Главная' },
     { path: '/deals', label: 'Сделки' },
-    { path: '/demo', label: 'Демо сделок' },
     { path: '/profile', label: 'Мой профиль' }
   ];
 
@@ -57,7 +56,6 @@ const Sidebar = ({ isOpen = true, onToggle }) => {
             >
               {item.path === '/' ? <BlocksIcon animate={isActive} /> : null}
               {item.path === '/deals' ? <AlbumIcon animate={isActive} /> : null}
-              {item.path === '/demo' ? <AlbumIcon animate={isActive} /> : null}
               {item.path === '/profile' ? (
                 user?.photo_url ? (
                   <img src={user.photo_url} alt="avatar" className="nav-avatar" />

@@ -42,3 +42,53 @@
 .login-container .telegram-login-button {
   margin: 0;
 }
+
+/* Разделитель */
+.login-divider {
+  margin: 20px 0;
+  position: relative;
+  text-align: center;
+}
+
+.login-divider::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background-color: #333;
+}
+
+.login-divider span {
+  background-color: #111;
+  padding: 0 15px;
+  color: #666;
+  font-size: 14px;
+  position: relative;
+  z-index: 1;
+}
+
+/* Кнопка продолжения без входа */
+.continue-guest-button {
+  width: 100%;
+  padding: 12px 24px;
+  background-color: transparent;
+  border: 2px solid #333;
+  border-radius: 10px;
+  color: #fff;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-top: 8px;
+}
+
+.continue-guest-button:hover {
+  border-color: #555;
+  background-color: #1a1a1a;
+}
+
+.continue-guest-button:active {
+  transform: translateY(1px);
+}

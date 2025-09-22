@@ -77,13 +77,8 @@ const TelegramAuth = ({ onAuth }) => {
     return (
       <div className="telegram-auth-container">
         <button className="telegram-dev-button" onClick={handleDevLogin}>
-          Войти через Telegram
+          Подключить Telegram
         </button>
-        <p className="telegram-dev-note">
-          {isDevelopment || window.location.hostname === 'localhost' ? 
-            'Режим разработки: эмуляция входа (Telegram виджет недоступен на localhost)' : 
-            'Ошибка загрузки виджета'}
-        </p>
       </div>
     );
   }

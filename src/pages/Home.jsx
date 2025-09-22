@@ -1,69 +1,97 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import WalletConnectButton from '../components/WalletConnectButton';
+import TelegramAuth from '../components/TelegramAuth/TelegramAuth';
+import { useAuth } from '../contexts/AuthContext';
+import { useNavigate } from 'react-router-dom';
+import AnimatedGifts from '../components/AnimatedGifts/AnimatedGifts';
 import './PageStyles.css';
 
 const Home = () => {
-  return (
-    <div id="main">
-      <h1>Главная страница</h1>
-      <p>Добро пожаловать в торговую платформу OTC!</p>
-      <div className="content-box" style={{ marginBottom: '16px' }}>
-        <h2>Подключите кошелек TON</h2>
-        <p>Чтобы продолжить, подключите Tonkeeper или другой поддерживаемый кошелек.</p>
-        <WalletConnectButton />
-      </div>
-      
-      <div className="stats-grid">
-        <div className="stat-card">
-          <h3>Общий объем торгов</h3>
-          <div className="stat-value">$1,245,789</div>
-        </div>
-        <div className="stat-card">
-          <h3>Активных сделок</h3>
-          <div className="stat-value">47</div>
-        </div>
-        <div className="stat-card">
-          <h3>Новых заявок</h3>
-          <div className="stat-value">12</div>
-        </div>
-      </div>
+  const { user, guestMode, login, logout } = useAuth();
+  const navigate = useNavigate();
 
-      <div className="content-box">
-        <h2>Последние сделки</h2>
-        <table className="table">
-          <thead>
-            <tr>
-              <th>Актив</th>
-              <th>Тип</th>
-              <th>Цена</th>
-              <th>Объем</th>
-              <th>Время</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>BTC/USD</td>
-              <td>Покупка</td>
-              <td>$42,150</td>
-              <td>2.5 BTC</td>
-              <td>10:45:23</td>
-            </tr>
-            <tr>
-              <td>ETH/USD</td>
-              <td>Продажа</td>
-              <td>$2,340</td>
-              <td>15.8 ETH</td>
-              <td>10:42:11</td>
-            </tr>
-            <tr>
-              <td>USDT/RUB</td>
-              <td>Покупка</td>
-              <td>92.5 ₽</td>
-              <td>50,000 USDT</td>
-              <td>10:38:05</td>
-            </tr>
-          </tbody>
-        </table>
+  // Управляем классом body для убирания padding у content
+  useEffect(() => {
+    document.body.classList.add('home-page-active');
+    return () => {
+      document.body.classList.remove('home-page-active');
+    };
+  }, []);
+
+  const handleTelegramAuth = async (userData) => {
+    try {
+      await login(userData);
+    } catch (e) {
+      console.error('Ошибка входа через Telegram:', e);
+    }
+  };
+
+  const handleLogout = () => {
+    logout();
+  };
+
+  return (
+    <div id="main" className="home-container home-page">
+      {/* Top Fade Grid Background */}
+      <div
+        className="home-grid-background"
+        style={{
+          backgroundImage: `
+            linear-gradient(to right, #222 1px, transparent 1px),
+            linear-gradient(to bottom, #222 1px, transparent 1px)
+          `,
+          backgroundSize: "20px 30px",
+          WebkitMaskImage:
+            "radial-gradient(ellipse 70% 60% at 50% 0%, #000 60%, transparent 100%)",
+          maskImage:
+            "radial-gradient(ellipse 70% 60% at 50% 0%, #000 60%, transparent 100%)",
+        }}
+      />
+
+      {/* Блок с анимированными подарками - показывается сверху на мобильных, справа на ПК */}
+      <AnimatedGifts />
+
+      {/* Основной контент */}
+      <div className="home-main-content">
+        <div className="home-header">
+          <h1>Привет, {user?.first_name || (guestMode ? 'Гость' : 'Пользователь')}!</h1>
+          <p>Добро пожаловать в торговую платформу OTC!</p>
+        </div>
+
+        {/* Визуализация счета */}
+        <div className="balance-card">
+          <div className="balance-header">
+            <h3>Баланс</h3>
+            <div className="balance-currency">RUB</div>
+          </div>
+          <div className="balance-amount">0.00</div>
+          <div className="balance-usd">≈ $0.00</div>
+          <div className="balance-actions">
+            <button className="balance-btn deposit-btn">
+              Пополнить
+            </button>
+            <button 
+              className="balance-btn withdraw-btn"
+              onClick={() => {
+                const cardNumber = localStorage.getItem('payment_card_number');
+                if (!cardNumber || !cardNumber.trim()) {
+                  alert('Для вывода средств необходимо привязать банковскую карту в профиле');
+                  return;
+                }
+                // Здесь будет логика вывода средств
+                alert('Функция вывода средств будет реализована');
+              }}
+            >
+              Вывести
+            </button>
+          </div>
+        </div>
+
+        <div className="content-box" style={{ marginBottom: '16px' }}>
+          <h2>Подключите кошелек TON</h2>
+          <p>Чтобы продолжить, подключите Tonkeeper или другой поддерживаемый кошелек.</p>
+          <WalletConnectButton />
+        </div>
       </div>
     </div>
   );

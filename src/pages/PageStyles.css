@@ -828,6 +828,97 @@
   background-color: #ff7875;
 }
 
+/* Стили для информации о пользователе */
+.user-info {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.user-field {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+  border-bottom: 1px solid #333;
+}
+
+.user-field:last-child {
+  border-bottom: none;
+}
+
+.user-field strong {
+  color: #fff;
+  font-weight: 600;
+}
+
+.user-field span {
+  color: #ccc;
+  font-family: monospace;
+}
+
+/* Стили для секции входа */
+.login-section {
+  margin-top: 20px;
+}
+
+.login-section h3 {
+  margin-bottom: 12px;
+  color: #fff;
+  font-size: 1.1rem;
+}
+
+/* Разделитель */
+.login-divider {
+  margin: 20px 0;
+  position: relative;
+  text-align: center;
+}
+
+.login-divider::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background-color: #333;
+}
+
+.login-divider span {
+  background-color: #000;
+  padding: 0 15px;
+  color: #666;
+  font-size: 14px;
+  position: relative;
+  z-index: 1;
+}
+
+/* Кнопка продолжения без входа */
+.continue-guest-button {
+  width: 100%;
+  padding: 12px 24px;
+  background-color: transparent;
+  border: 2px solid #333;
+  border-radius: 10px;
+  color: #fff;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-top: 8px;
+}
+
+.continue-guest-button:hover {
+  border-color: #555;
+  background-color: #1a1a1a;
+}
+
+.continue-guest-button:active {
+  transform: translateY(1px);
+}
+
 /* Кнопка WalletConnect */
 button.WalletConnectButton {
   margin-top: 15px;
@@ -1764,4 +1855,294 @@ button.WalletConnectButton {
     text-align: center;
   }
 }
+
+/* Универсальные стили для устройств меньше 1028px */
+@media (max-width: 1027px) {
+  .home-container {
+    padding: 0 !important;
+    margin: 0 !important;
+    gap: 0 !important;
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+  }
+  
+  .home-features {
+    display: flex !important;
+    width: 100% !important;
+    gap: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+  }
+  
+  .feature-item {
+    flex: 1 !important;
+    width: calc(100% / 6) !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    gap: 0 !important;
+    border: none !important;
+    border-radius: 0 !important;
+    min-width: 0 !important;
+    flex-shrink: 0 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+  
+  /* Скрыть все карточки после 6-й */
+  .feature-item:nth-child(n+7) {
+    display: none !important;
+  }
+  
+  .home-main-content {
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+  
+  .home-header {
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+  
+  .home-header h1 {
+    margin: 0 !important;
+  }
+  
+  .home-header p {
+    margin: 0 !important;
+  }
+}
+
+/* Стили для главной страницы */
+.home-container {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  padding: 0;
+  margin: 0;
+  height: 100%;
+  position: relative;
+  background-color: #111111;
+}
+
+/* Фоновая сетка с градиентной маской */
+.home-grid-background {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* Убираем padding у content для главной страницы */
+.home-page {
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+/* Убираем padding у content когда внутри главная страница */
+.content:has(.home-page) {
+  padding: 0 !important;
+}
+
+/* Альтернативный способ для старых браузеров */
+body.home-page-active .content {
+  padding: 0 !important;
+}
+
+/* Стили для подарков теперь в AnimatedGifts.css */
+
+.home-main-content {
+  flex: 1;
+  position: relative;
+  z-index: 1;
+}
+
+/* Убираем кастомные отступы, используем стандартный p-6 */
+
+/* Карточка баланса */
+.balance-card {
+  background: #0d0d0d;
+  border: 1px solid #222;
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 24px;
+  position: relative;
+  overflow: hidden;
+  width: fit-content;
+  max-width: 400px;
+  min-width: 300px;
+  box-sizing: border-box;
+}
+
+.balance-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, #3b82f6, #8b5cf6, #06b6d4);
+}
+
+.balance-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.balance-header h3 {
+  margin: 0;
+  font-size: 1rem;
+  color: #ccc;
+  font-weight: 500;
+}
+
+.balance-currency {
+  background: #1a1a1a;
+  border: 1px solid #333;
+  border-radius: 6px;
+  padding: 4px 8px;
+  font-size: 0.8rem;
+  color: #60a5fa;
+  font-weight: 600;
+  cursor: default;
+}
+
+.balance-amount {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #fff;
+  margin-bottom: 4px;
+  line-height: 1;
+}
+
+.balance-usd {
+  font-size: 1rem;
+  color: #888;
+  font-weight: 500;
+  margin-bottom: 16px;
+}
+
+.balance-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.balance-btn {
+  flex: 1;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: center;
+}
+
+.deposit-btn {
+  background: #1a1a1a;
+  border: 1px solid #333;
+  color: #60a5fa;
+}
+
+.deposit-btn:hover {
+  background: #2a2a2a;
+  border-color: #444;
+  color: #93c5fd;
+}
+
+.withdraw-btn {
+  background: #1a1a1a;
+  border: 1px solid #333;
+  color: #f87171;
+}
+
+.withdraw-btn:hover {
+  background: #2a2a2a;
+  border-color: #444;
+  color: #fca5a5;
+}
+
+.home-header {
+  margin-bottom: 24px;
+}
+
+.home-header h1 {
+  margin: 0 0 8px 0;
+  font-size: 2rem;
+  font-weight: 700;
+  color: #fff;
+}
+
+.home-header p {
+  margin: 0;
+  font-size: 1.125rem;
+  color: #aaa;
+}
+
+/* Адаптивность для ПК (>=1028px) */
+@media (min-width: 1028px) {
+  .home-container {
+    flex-direction: row;
+    align-items: flex-start;
+    gap: 0;
+    padding: 0;
+    height: 100%;
+    position: relative;
+  }
+  
+  /* Стили для .home-features теперь в AnimatedGifts.css */
+  
+  .home-main-content {
+    flex: 1;
+    min-width: 0;
+    padding: 24px 150px 24px 24px;
+    position: relative;
+    z-index: 1;
+    max-width: calc(100% - 150px);
+    box-sizing: border-box;
+  }
+}
+
+/* Адаптивность для планшетов и мобильных */
+@media (max-width: 1027px) {
+  .home-main-content {
+    padding: 24px;
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 768px) {
+  .home-main-content {
+    padding: 16px;
+  }
+  
+  .balance-card {
+    padding: 16px;
+    min-width: 280px;
+    max-width: 100%;
+  }
+  
+  .balance-amount {
+    font-size: 2rem;
+  }
+  
+  .balance-actions {
+    flex-direction: column;
+    gap: 6px;
+  }
+  
+  .balance-btn {
+    padding: 10px 16px;
+    font-size: 0.85rem;
+  }
+}
+
+/* Адаптивность для планшетов и мобильных - стили в AnimatedGifts.css */
 

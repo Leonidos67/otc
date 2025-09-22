@@ -3,14 +3,14 @@ import { useNavigate } from "react-router-dom";
 import ChevronRight from "../components/Icons/ChevronRight";
 import WalletConnectButton from "../components/WalletConnectButton";
 import CreditCard from "../components/CreditCard/CreditCard";
-import UserGifts from "../components/UserGifts/UserGifts";
+import TelegramAuth from "../components/TelegramAuth/TelegramAuth";
 import { useAuth } from "../contexts/AuthContext";
 import { useLocation } from "react-router-dom";
 import "./PageStyles.css";
 import { tonConnect } from "../utils/ton/tonConnect";
 
 const Profile = () => {
-  const { user, logout } = useAuth();
+  const { user, logout, login, guestMode } = useAuth();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("Общие");
   const [cardNumber, setCardNumber] = useState(() => localStorage.getItem('payment_card_number') || "");
@@ -36,9 +36,29 @@ const Profile = () => {
     "Безопасность и конфиденциальность",
   ];
 
+  const handleTelegramAuth = async (userData) => {
+    try {
+      await login(userData);
+    } catch (e) {
+      console.error('Ошибка входа через Telegram:', e);
+    }
+  };
+
   const renderTabContent = () => {
     switch (activeTab) {
       case "Общие":
+        if (!user && guestMode) {
+          return (
+            <>
+              <div className="content-box" style={{ marginBottom: "20px" }}>
+                <div className="login-section">
+                  <h3>Войти через Telegram</h3>
+                  <TelegramAuth onAuth={handleTelegramAuth} />
+                </div>
+              </div>
+            </>
+          );
+        }
         return (
           <>
             <div className="input-group">
@@ -53,7 +73,6 @@ const Profile = () => {
               <label>ID</label>
               <input type="text" value={user?.id || ""} readOnly />
             </div>
-            <UserGifts />
           </>
         );
       case "Способы оплаты/приема платежей":
@@ -172,6 +191,7 @@ const Profile = () => {
   }, []);
 
   useEffect(() => {
+    if (!menuRef.current) return;
     const buttons = menuRef.current.querySelectorAll(".profile-tab-button");
 
     const moveIndicator = (el) => {
@@ -217,6 +237,7 @@ const Profile = () => {
     };
   }, [menuOpen]);
 
+
   return (
     <div className="p-6 profile-page">
       <h1 className="profile-page-title">Мой профиль</h1>
@@ -231,10 +252,13 @@ const Profile = () => {
           />
           <div className="profile-info">
             <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
-              <p className="profile-name" style={{ margin: 0 }}>{user?.first_name || "Имя"}</p>
-              
+              <p className="profile-name" style={{ margin: 0 }}>
+                {user?.first_name || (guestMode ? "Гость" : "Имя")}
+              </p>
             </div>
-            <p className="profile-username">@{user?.username || "username"}</p>
+            <p className="profile-username">
+              {user?.username ? `@${user.username}` : (guestMode ? "Режим гостя" : "username")}
+            </p>
           </div>
         </div>
       </div>

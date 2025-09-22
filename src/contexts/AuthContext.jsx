@@ -13,12 +13,15 @@ export const useAuth = () => {
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [guestMode, setGuestMode] = useState(false);
 
   // Default to local serverless path; in development verification is skipped anyway
   const API_URL = process.env.REACT_APP_API_URL || '/api';
 
   useEffect(() => {
     const savedUser = localStorage.getItem('telegram_user');
+    const savedGuestMode = localStorage.getItem('guest_mode');
+    
     if (savedUser) {
       try {
         setUser(JSON.parse(savedUser));
@@ -27,6 +30,11 @@ export const AuthProvider = ({ children }) => {
         localStorage.removeItem('telegram_user');
       }
     }
+    
+    if (savedGuestMode === 'true') {
+      setGuestMode(true);
+    }
+    
     setLoading(false);
   }, []);
 
@@ -75,7 +83,14 @@ export const AuthProvider = ({ children }) => {
 
   const logout = () => {
     setUser(null);
+    setGuestMode(false);
     localStorage.removeItem('telegram_user');
+    localStorage.removeItem('guest_mode');
+  };
+
+  const continueAsGuest = () => {
+    setGuestMode(true);
+    localStorage.setItem('guest_mode', 'true');
   };
 
   const updateUser = (updates) => {
@@ -93,6 +108,8 @@ export const AuthProvider = ({ children }) => {
         updateUser,
         loading,
         isAuthenticated: !!user,
+        guestMode,
+        continueAsGuest,
         apiUrl: API_URL
       }}
     >
