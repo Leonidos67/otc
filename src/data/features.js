@@ -260,27 +260,32 @@ export const featuresData = [
   },
   {
     title: 'Big Years',
+    icon: 'https://nft.fragment.com/gift/bigyear-4692.medium.jpg',
+    desktopOnly: false
+  },
+  {
+    title: 'Big Years',
     icon: 'https://nft.fragment.com/gift/bigyear-37423.medium.jpg',
     desktopOnly: false
   },
   {
     title: 'Big Years',
-    icon: 'https://nft.fragment.com/gift/bigyear-54693.medium.jpg',
+    icon: 'https://nft.fragment.com/gift/bigyear-54691.medium.jpg',
     desktopOnly: false
   },
   {
     title: 'Big Years',
-    icon: 'https://nft.fragment.com/gift/bigyear-15104.medium.jpg',
+    icon: 'https://nft.fragment.com/gift/bigyear-151041.medium.jpg',
     desktopOnly: false
   },
   {
     title: 'Big Years',
-    icon: 'https://nft.fragment.com/gift/bigyear-22730.medium.jpg',
+    icon: 'https://nft.fragment.com/gift/bigyear-22731.medium.jpg',
     desktopOnly: false
   },
   {
     title: 'Big Years',
-    icon: 'https://nft.fragment.com/gift/bigyear-28680.medium.jpg',
+    icon: 'https://nft.fragment.com/gift/bigyear-28681.medium.jpg',
     desktopOnly: false
   },
 
