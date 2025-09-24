@@ -53,6 +53,6 @@ DealSchema.methods.toPublicJSON = function toPublicJSON() {
   };
 };
 
-module.exports = mongoose.model('Deal', DealSchema);
+module.exports = mongoose.models.Deal || mongoose.model('Deal', DealSchema);
 
 
