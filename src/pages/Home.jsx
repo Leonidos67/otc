@@ -1,14 +1,18 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import WalletConnectButton from '../components/WalletConnectButton';
 import TelegramAuth from '../components/TelegramAuth/TelegramAuth';
 import { useAuth } from '../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import AnimatedGifts from '../components/AnimatedGifts/AnimatedGifts';
 import './PageStyles.css';
+import { Copy } from '../components/Icons/Copy.jsx';
 
 const Home = () => {
   const { user, guestMode, login, logout } = useAuth();
   const navigate = useNavigate();
+  const [usdRate, setUsdRate] = useState(() => (parseFloat((localStorage.getItem('usd_rate') || '100').toString().replace(',', '.')) || 100));
+  const balanceRub = (parseFloat((localStorage.getItem('balance_rub') || '0').toString().replace(',', '.')) || 0);
+  const balanceUsd = balanceRub / (usdRate > 0 ? usdRate : 100);
 
   // Управляем классом body для убирания padding у content
   useEffect(() => {
@@ -16,6 +20,24 @@ const Home = () => {
     return () => {
       document.body.classList.remove('home-page-active');
     };
+  }, []);
+
+  // Fetch USD rate from CBR-XML-Daily on mount
+  useEffect(() => {
+    const fetchRate = async () => {
+      try {
+        const res = await fetch('https://www.cbr-xml-daily.ru/daily_json.js');
+        const data = await res.json();
+        const nextRate = parseFloat(data?.Valute?.USD?.Value);
+        if (!Number.isNaN(nextRate) && nextRate > 0) {
+          localStorage.setItem('usd_rate', String(nextRate));
+          setUsdRate(nextRate);
+        }
+      } catch (_) {
+        // ignore network errors, keep previous rate
+      }
+    };
+    fetchRate();
   }, []);
 
   const handleTelegramAuth = async (userData) => {
@@ -60,27 +82,56 @@ const Home = () => {
 
         {/* Визуализация счета */}
         <div className="balance-card">
-          <div className="balance-header">
+          <div className="balance-top-row">
             <h3>Баланс</h3>
-            <div className="balance-currency">RUB</div>
+            <button className="manage-wallet-btn" onClick={() => navigate('/profile?tab=payments')}>
+              Управление кошельком
+            </button>
           </div>
-          <div className="balance-amount">0.00</div>
-          <div className="balance-usd">≈ $0.00</div>
+
+          <div className="balance-amount">{balanceRub.toFixed(2)}</div>
+          <div className="balance-usd">≈ ${balanceUsd.toFixed(2)}</div>
+
+          {/* Номер карты и копирование */}
+          <div className="card-row">
+            <div className="card-number">
+              {localStorage.getItem('payment_card_number') || 'Карта не привязана'}
+            </div>
+            <button
+              className="copy-btn"
+              onMouseEnter={(e) => e.currentTarget.setAttribute('data-active', 'true')}
+              onMouseLeave={(e) => e.currentTarget.removeAttribute('data-active')}
+              onMouseDown={(e) => e.currentTarget.setAttribute('data-active', 'true')}
+              onMouseUp={(e) => e.currentTarget.removeAttribute('data-active')}
+              onClick={() => {
+                const card = localStorage.getItem('payment_card_number') || '';
+                if (!card) return;
+                navigator.clipboard.writeText(card).then(() => {
+                  // ok
+                }).catch(() => {
+                  const ta = document.createElement('textarea');
+                  ta.value = card;
+                  document.body.appendChild(ta);
+                  ta.select();
+                  document.execCommand('copy');
+                  document.body.removeChild(ta);
+                });
+              }}
+            >
+              <span style={{ display: 'inline-flex', alignItems: 'center' }}>
+                <Copy width={14} height={14} stroke="#fff" active={Boolean(document?.activeElement && document.activeElement.getAttribute && document.activeElement.getAttribute('data-active'))} />
+              </span>
+              <span>Скопировать</span>
+            </button>
+          </div>
+
           <div className="balance-actions">
-            <button className="balance-btn deposit-btn">
+            <button className="balance-btn deposit-btn" onClick={() => navigate('/deposit')}>
               Пополнить
             </button>
             <button 
               className="balance-btn withdraw-btn"
-              onClick={() => {
-                const cardNumber = localStorage.getItem('payment_card_number');
-                if (!cardNumber || !cardNumber.trim()) {
-                  alert('Для вывода средств необходимо привязать банковскую карту в профиле');
-                  return;
-                }
-                // Здесь будет логика вывода средств
-                alert('Функция вывода средств будет реализована');
-              }}
+              onClick={() => navigate('/withdraw')}
             >
               Вывести
             </button>

@@ -65,11 +65,81 @@ export const featuresData = [
     icon: 'https://nft.fragment.com/gift/deskcalendar-276050.medium.jpg',
     desktopOnly: false
   },
+  {
+    title: 'Desk Calendar',
+    icon: 'https://nft.fragment.com/gift/deskcalendar-161981.medium.jpg',
+    desktopOnly: false
+  },
+  {
+    title: 'Desk Calendar',
+    icon: 'https://nft.fragment.com/gift/deskcalendar-276051.medium.jpg',
+    desktopOnly: false
+  },
+  {
+    title: 'Desk Calendar',
+    icon: 'https://nft.fragment.com/gift/deskcalendar-161982.medium.jpg',
+    desktopOnly: false
+  },
+  {
+    title: 'Desk Calendar',
+    icon: 'https://nft.fragment.com/gift/deskcalendar-276052.medium.jpg',
+    desktopOnly: false
+  },
+  {
+    title: 'Desk Calendar',
+    icon: 'https://nft.fragment.com/gift/deskcalendar-161984.medium.jpg',
+    desktopOnly: false
+  },
+  {
+    title: 'Desk Calendar',
+    icon: 'https://nft.fragment.com/gift/deskcalendar-276054.medium.jpg',
+    desktopOnly: false
+  },
 
   // Astral Shards
   {
     title: 'Astral Shards',
-    icon: 'https://nft.fragment.com/gift/astralshard-3046.medium.jpg',
+    icon: 'https://nft.fragment.com/gift/astralshard-1046.medium.jpg',
+    desktopOnly: false
+  },
+  {
+    title: 'Astral Shards',
+    icon: 'https://nft.fragment.com/gift/astralshard-4202.medium.jpg',
+    desktopOnly: false
+  },
+  {
+    title: 'Astral Shards',
+    icon: 'https://nft.fragment.com/gift/astralshard-3146.medium.jpg',
+    desktopOnly: false
+  },
+  {
+    title: 'Astral Shards',
+    icon: 'https://nft.fragment.com/gift/astralshard-2902.medium.jpg',
+    desktopOnly: false
+  },
+  {
+    title: 'Astral Shards',
+    icon: 'https://nft.fragment.com/gift/astralshard-3041.medium.jpg',
+    desktopOnly: false
+  },
+  {
+    title: 'Astral Shards',
+    icon: 'https://nft.fragment.com/gift/astralshard-4903.medium.jpg',
+    desktopOnly: false
+  },
+  {
+    title: 'Astral Shards',
+    icon: 'https://nft.fragment.com/gift/astralshard-3043.medium.jpg',
+    desktopOnly: false
+  },
+  {
+    title: 'Astral Shards',
+    icon: 'https://nft.fragment.com/gift/astralshard-4908.medium.jpg',
+    desktopOnly: false
+  },
+  {
+    title: 'Astral Shards',
+    icon: 'https://nft.fragment.com/gift/astralshard-346.medium.jpg',
     desktopOnly: false
   },
   {

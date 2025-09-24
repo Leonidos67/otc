@@ -10,6 +10,9 @@ import PublicDealView from './pages/PublicDealView';
 import AvailableDeals from './pages/AvailableDeals';
 import Profile from './pages/Profile';
 import SecurityPasscode from './pages/SecurityPasscode';
+import Withdraw from './pages/Withdraw';
+import Deposit from './pages/Deposit';
+import Policy from './pages/Policy';
 import Login from './pages/Login';
 import './App.css';
 
@@ -79,6 +82,13 @@ function AppContent() {
           </Layout>
         </ProtectedRoute>
       } />
+      <Route path="/withdraw" element={
+        <ProtectedRoute>
+          <Layout>
+            <Withdraw />
+          </Layout>
+        </ProtectedRoute>
+      } />
       <Route path="/security/passcode" element={
         <ProtectedRoute>
           <Layout>
@@ -86,6 +96,14 @@ function AppContent() {
           </Layout>
         </ProtectedRoute>
       } />
+      <Route path="/deposit" element={
+        <ProtectedRoute>
+          <Layout>
+            <Deposit />
+          </Layout>
+        </ProtectedRoute>
+      } />
+      <Route path="/policy" element={<Policy />} />
     </Routes>
   );
 }

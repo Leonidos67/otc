@@ -73,6 +73,28 @@
   transform: translateY(-2px);
 }
 
+/* Стили для кликабельных подарков */
+.gift-clickable {
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.gift-clickable:hover {
+  border-color: #4ade80 !important;
+  box-shadow: 0 8px 25px rgba(74, 222, 128, 0.2) !important;
+  transform: translateY(-2px) scale(1.02) !important;
+}
+
+.gift-clickable:active {
+  transform: translateY(0) scale(0.98) !important;
+  box-shadow: 0 4px 15px rgba(74, 222, 128, 0.3) !important;
+}
+
+.gift-clickable:hover .feature-icon img {
+  transform: scale(1.1) !important;
+  filter: brightness(1.1) !important;
+}
+
 .feature-icon {
   flex-shrink: 0;
   width: 100%;
@@ -95,6 +117,7 @@
 }
 
 .feature-content h3 {
+  cursor: pointer;
   margin: 0;
   font-size: 0.9rem;
   font-weight: 600;
@@ -116,7 +139,7 @@
   white-space: nowrap;
   backdrop-filter: blur(2px);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-  cursor: default;
+  cursor: pointer;
 }
 
 .feature-item:hover .feature-icon::after {

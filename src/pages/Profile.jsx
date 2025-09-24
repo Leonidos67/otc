@@ -4,6 +4,7 @@ import ChevronRight from "../components/Icons/ChevronRight";
 import WalletConnectButton from "../components/WalletConnectButton";
 import CreditCard from "../components/CreditCard/CreditCard";
 import TelegramAuth from "../components/TelegramAuth/TelegramAuth";
+import ProfileEditModal from "../components/ProfileEditModal/ProfileEditModal";
 import { useAuth } from "../contexts/AuthContext";
 import { useLocation } from "react-router-dom";
 import "./PageStyles.css";
@@ -25,6 +26,16 @@ const Profile = () => {
   const [sheetOffsetY, setSheetOffsetY] = useState(0);
   const [menuOpen, setMenuOpen] = useState(false);
   const menuButtonRef = useRef(null);
+  const [showProfileEditModal, setShowProfileEditModal] = useState(false);
+  const [profileBackground, setProfileBackground] = useState(() => 
+    localStorage.getItem('profile_background') || 'none'
+  );
+  const [profileEmoji, setProfileEmoji] = useState(() => 
+    localStorage.getItem('profile_emoji') || '😊'
+  );
+  const [customPhoto, setCustomPhoto] = useState(() => 
+    localStorage.getItem('profile_custom_photo') || null
+  );
 
   const menuRef = useRef(null);
   const indicatorRef = useRef(null);
@@ -35,6 +46,25 @@ const Profile = () => {
     "Подключенные аккаунты",
     "Безопасность и конфиденциальность",
   ];
+
+  // Функция для получения стилей фона
+  const getBackgroundStyle = (backgroundId) => {
+    const backgrounds = {
+      'none': { background: 'transparent' },
+      'gradient1': { background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' },
+      'gradient2': { background: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)' },
+      'gradient3': { background: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)' },
+      'gradient4': { background: 'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)' },
+      'gradient5': { background: 'linear-gradient(135deg, #fa709a 0%, #fee140 100%)' },
+      'gradient6': { background: 'linear-gradient(135deg, #a8edea 0%, #fed6e3 100%)' },
+      'dark': { background: '#1a1a1a' },
+      'purple': { background: '#6366f1' },
+      'blue': { background: '#3b82f6' },
+      'green': { background: '#10b981' },
+      'red': { background: '#ef4444' }
+    };
+    return backgrounds[backgroundId] || backgrounds['none'];
+  };
 
   const handleTelegramAuth = async (userData) => {
     try {
@@ -245,11 +275,79 @@ const Profile = () => {
 
       <div className="flex items-center mb- profile-header" style={{ marginTop: "20px"}}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-          <img
-            src={user?.photo_url || "https://via.placeholder.com/96"}
-            alt="Profile"
-            className="profile-photo"
-          />
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
+            <div 
+              className="profile-photo-container"
+              style={{
+                position: 'relative',
+                width: '96px',
+                height: '96px',
+                borderRadius: '50%',
+                overflow: 'hidden',
+                cursor: 'default',
+                userSelect: 'none',
+                ...getBackgroundStyle(profileBackground)
+              }}
+            >
+              {profileBackground === 'none' && !customPhoto ? (
+                // Показываем эмодзи по центру если нет фона и нет загруженного фото
+                <div className="profile-emoji-display">
+                  {profileEmoji}
+                </div>
+              ) : profileBackground !== 'none' && !customPhoto ? (
+                // Показываем эмодзи по центру если есть фон но нет загруженного фото
+                <div className="profile-emoji-display">
+                  {profileEmoji}
+                </div>
+              ) : (
+                // Показываем изображение
+                <>
+                  <img
+                    src={customPhoto || user?.photo_url || "https://via.placeholder.com/96"}
+                    alt="Profile"
+                    className="profile-photo"
+                    style={{
+                      width: '100%',
+                      height: '100%',
+                      objectFit: 'cover',
+                      position: 'relative',
+                      zIndex: 1
+                    }}
+                  />
+                  {profileBackground !== 'none' && (
+                    <div 
+                      className="profile-emoji-overlay"
+                      style={{
+                        position: 'absolute',
+                        bottom: '4px',
+                        right: '4px',
+                        fontSize: '20px',
+                        zIndex: 2,
+                        background: 'rgba(0, 0, 0, 0.6)',
+                        borderRadius: '50%',
+                        width: '28px',
+                        height: '28px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        backdropFilter: 'blur(4px)',
+                        userSelect: 'none',
+                        cursor: 'default'
+                      }}
+                    >
+                      {profileEmoji}
+                    </div>
+                  )}
+                </>
+              )}
+            </div>
+            <button 
+              className="profile-edit-btn"
+              onClick={() => setShowProfileEditModal(true)}
+            >
+              Ред.
+            </button>
+          </div>
           <div className="profile-info">
             <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
               <p className="profile-name" style={{ margin: 0 }}>
@@ -349,6 +447,17 @@ const Profile = () => {
       <button className="logout-button" onClick={logout}>
         Выйти
       </button>
+
+      {/* Модальное окно редактирования профиля */}
+      <ProfileEditModal 
+        isOpen={showProfileEditModal}
+        onClose={() => setShowProfileEditModal(false)}
+        onSave={(background, emoji, photo) => {
+          setProfileBackground(background);
+          setProfileEmoji(emoji);
+          setCustomPhoto(photo);
+        }}
+      />
     </div>
   );
 };

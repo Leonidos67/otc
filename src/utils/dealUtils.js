@@ -207,6 +207,84 @@ export const getAvailableDeals = (userId) => {
   );
 };
 
+// API helpers for backend integration
+const API_BASE = process.env.REACT_APP_API_URL || '/api';
+
+function mapBackendDealToUiShape(backendDeal) {
+  // backendDeal: { id, creatorId, takerId, asset, amount, status, createdAt, payment, confirmedBy }
+  const statusMap = {
+    open: 'waiting_for_participant',
+    matched: 'waiting_for_confirmation',
+    completed: 'completed',
+    cancelled: 'cancelled'
+  };
+  const confirmedBy = Array.isArray(backendDeal.confirmedBy) ? backendDeal.confirmedBy : [];
+  const creatorReady = confirmedBy.includes(backendDeal.creatorId);
+  const takerReady = backendDeal.takerId ? confirmedBy.includes(backendDeal.takerId) : false;
+  return {
+    id: backendDeal.id,
+    creatorId: backendDeal.creatorId,
+    createdAt: backendDeal.createdAt,
+    status: statusMap[backendDeal.status] || backendDeal.status,
+    method: backendDeal.asset || 'N/A',
+    amount: backendDeal.amount,
+    gifts: Array.isArray(backendDeal.gifts) ? backendDeal.gifts : [],
+    payment: backendDeal.payment || null,
+    confirmedBy,
+    participants: {
+      creator: { id: backendDeal.creatorId, confirmed: creatorReady, ready: creatorReady },
+      participant: backendDeal.takerId
+        ? { id: backendDeal.takerId, confirmed: takerReady, ready: takerReady }
+        : null
+    }
+  };
+}
+
+export async function fetchDealFromApi(dealId) {
+  try {
+    const res = await fetch(`${API_BASE}/deals/${dealId}`);
+    if (!res.ok) return null;
+    const data = await res.json();
+    return mapBackendDealToUiShape(data);
+  } catch (_e) {
+    return null;
+  }
+}
+
+export async function confirmDealOnApi(dealId, userId) {
+  try {
+    const res = await fetch(`${API_BASE}/deals/${dealId}/confirm`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ userId })
+    });
+    if (!res.ok) return null;
+    const data = await res.json();
+    return mapBackendDealToUiShape(data);
+  } catch (_e) {
+    return null;
+  }
+}
+
+/**
+ * Асинхронно получает сделку из API, а при неудаче — из localStorage
+ */
+export const getPublicDeal = async (dealId) => {
+  const apiDeal = await fetchDealFromApi(dealId);
+  if (apiDeal) return apiDeal;
+
+  // Fallback к существующей логике
+  const sessionDeal = sessionStorage.getItem(`deal_${dealId}`);
+  if (sessionDeal) return JSON.parse(sessionDeal);
+  const deals = JSON.parse(localStorage.getItem('deals') || '[]');
+  const deal = deals.find(d => d.id === dealId);
+  if (deal) {
+    sessionStorage.setItem(`deal_${dealId}`, JSON.stringify(deal));
+    return deal;
+  }
+  return null;
+};
+
 /**
  * Получает сделку из URL-параметров (для публичного доступа)
  * @param {string} dealId - ID сделки из URL

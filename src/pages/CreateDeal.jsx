@@ -3,8 +3,8 @@ import { tonConnect } from '../utils/ton/tonConnect';
 import { Link, useNavigate } from 'react-router-dom';
 import './PageStyles.css';
 import { useTonWallet } from '@tonconnect/ui-react';
-import { gifts } from "../data/gifts";
-import { saveDeal, createPublicDealUrl } from '../utils/dealUtils';
+import { gifts as giftsCatalog } from "../data/gifts";
+import { createPublicDealUrl } from '../utils/dealUtils';
 
 const CreateDeal = () => {
   return (
@@ -32,8 +32,9 @@ export default CreateDeal;
 const DealSteps = () => {
   const [step, setStep] = useState(1);
   const [method, setMethod] = useState(null);
-  const [gifts, setGifts] = useState([]); // Массив выбранных подарков
+  const [gifts, setGifts] = useState([]); // Массив выбранных подарков (IDs)
   const [amount, setAmount] = useState(''); // Сумма сделки
+  const [terms, setTerms] = useState(''); // Условия сделки (необязательно)
   const [createdDealId, setCreatedDealId] = useState(null); // ID созданной сделки
   const uiWallet = useTonWallet();
   const navigate = useNavigate();
@@ -53,37 +54,36 @@ const DealSteps = () => {
   };
 
   // Функция создания сделки
-  const createDeal = () => {
-    const dealData = {
-      method,
+  const createDeal = async () => {
+    const creator = localStorage.getItem('user_id') || 'anonymous';
+    const payload = {
+      creatorId: creator,
+      asset: method,
       amount: parseFloat(amount),
+      terms: terms || '',
       gifts: gifts.map(giftId => {
-        const gift = gifts.find(g => g.id === giftId);
+        const gift = giftsCatalog.find(g => g.id === giftId) || null;
         return gift ? { id: gift.id, title: gift.title, img: gift.img } : null;
-      }).filter(Boolean),
-      userId: localStorage.getItem('user_id') || 'anonymous',
-      creatorId: localStorage.getItem('user_id') || 'anonymous',
-      status: 'waiting_for_participant', // Новый статус
-      participants: {
-        creator: {
-          id: localStorage.getItem('user_id') || 'anonymous',
-          confirmed: false,
-          ready: false
-        },
-        participant: null
-      }
+      }).filter(Boolean)
     };
 
-    console.log('Создание сделки с данными:', dealData);
-    const dealId = saveDeal(dealData);
-    console.log('Создана сделка с ID:', dealId);
-    
-    // Проверяем, что сделка действительно сохранилась
-    const savedDeals = JSON.parse(localStorage.getItem('deals') || '[]');
-    console.log('Все сохраненные сделки:', savedDeals);
-    
-    setCreatedDealId(dealId);
-    return dealId;
+    try {
+      const res = await fetch((process.env.REACT_APP_API_URL || '/api') + '/deals', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      if (!res.ok) {
+        throw new Error('API error ' + res.status);
+      }
+      const data = await res.json(); // { id, creatorId, ... }
+      setCreatedDealId(data.id);
+      return data.id;
+    } catch (e) {
+      console.error('Не удалось создать сделку через API, ошибка:', e);
+      alert('Не удалось создать сделку. Попробуйте ещё раз.');
+      return null;
+    }
   };
 
   return (
@@ -106,6 +106,19 @@ const DealSteps = () => {
                   min="0"
                   step="0.01"
                 />
+              </div>
+              <div className="input-group" style={{ marginTop: 12 }}>
+                <label>Условия сделки <span style={{ color: '#777' }}>(необязательно)</span></label>
+                <input
+                  placeholder="Опишите условия сделки"
+                  value={terms}
+                  onChange={(e) => setTerms(e.target.value)}
+                  rows={4}
+                  style={{ resize: 'vertical' }}
+                />
+                <div style={{ marginTop: 6, fontSize: 12, color: '#888' }}>
+                  Если оставить пустым, на странице сделки покажем: «Условия не прописаны, продолжая, вы соглашаетесь с <a href="/policy" style={{ color: 'inherit', textDecoration: 'underline' }}>Политикой конфиденциальности</a>.»
+                </div>
               </div>
             </div>
           )}
@@ -169,30 +182,44 @@ const DealSteps = () => {
                     <p className="success-description">
                       Перейдите к списку всех сделок, чтобы управлять своими предложениями и просматривать активные обмены.
                     </p>
-                    <button
-                      onClick={() => {
-                        if (createdDealId) {
-                          const dealUrl = createPublicDealUrl(createdDealId);
-                          navigator.clipboard.writeText(dealUrl).then(() => {
-                            alert('Публичная ссылка на сделку скопирована в буфер обмена!\n\nТеперь вы можете поделиться этой ссылкой с любым пользователем, и он сможет присоединиться к сделке на любом устройстве!');
-                          }).catch(() => {
-                            // Fallback для старых браузеров
-                            const textArea = document.createElement('textarea');
-                            textArea.value = dealUrl;
-                            document.body.appendChild(textArea);
-                            textArea.select();
-                            document.execCommand('copy');
-                            document.body.removeChild(textArea);
-                            alert('Публичная ссылка на сделку скопирована в буфер обмена!\n\nТеперь вы можете поделиться этой ссылкой с любым пользователем, и он сможет присоединиться к сделке на любом устройстве!');
-                          });
-                        } else {
-                          window.location.href = '/deals';
-                        }
-                      }}
-                      className="success-button"
-                    >
-                      {createdDealId ? '📤 Поделиться сделкой' : 'Перейти к сделкам'}
-                    </button>
+                    <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+                      <button
+                        onClick={() => {
+                          if (createdDealId) {
+                            const dealUrl = createPublicDealUrl(createdDealId);
+                            navigator.clipboard.writeText(dealUrl).then(() => {
+                              alert('Публичная ссылка на сделку скопирована в буфер обмена!\n\nТеперь вы можете поделиться этой ссылкой с любым пользователем, и он сможет присоединиться к сделке на любом устройстве!');
+                            }).catch(() => {
+                              // Fallback для старых браузеров
+                              const textArea = document.createElement('textarea');
+                              textArea.value = dealUrl;
+                              document.body.appendChild(textArea);
+                              textArea.select();
+                              document.execCommand('copy');
+                              document.body.removeChild(textArea);
+                              alert('Публичная ссылка на сделку скопирована в буфер обмена!\n\nТеперь вы можете поделиться этой ссылкой с любым пользователем, и он сможет присоединиться к сделке на любом устройстве!');
+                            });
+                          } else {
+                            window.location.href = '/deals';
+                          }
+                        }}
+                        className="success-button"
+                      >
+                        {createdDealId ? '📤 Поделиться сделкой' : 'Перейти к сделкам'}
+                      </button>
+                      <button
+                        onClick={() => {
+                          if (createdDealId) {
+                            window.location.href = `/deal/${createdDealId}`;
+                          } else {
+                            window.location.href = '/deals';
+                          }
+                        }}
+                        className="success-button"
+                      >
+                        {createdDealId ? '🔎 Открыть сделку' : 'Перейти к сделкам'}
+                      </button>
+                    </div>
                   </div>
                 </div>
 
@@ -244,7 +271,7 @@ const DealSteps = () => {
             <button
               type="button"
               className={`arrow-btn next-button ${!isStepValid(step) ? 'disabled' : ''}`}
-              onClick={() => {
+              onClick={async () => {
                 // Проверяем валидность текущего шага
                 if (!isStepValid(step)) {
                   return;
@@ -269,9 +296,10 @@ const DealSteps = () => {
                   }
                 }
                 
-                // Если переходим к шагу 3, создаем сделку
+                // Если переходим к шагу 3, создаем сделку через API
                 if (step === 2) {
-                  createDeal();
+                  const newId = await createDeal();
+                  if (!newId) return; // останемся на шаге 2 при ошибке
                 }
                 
                 setStep((s) => Math.min(3, s + 1));
@@ -352,7 +380,7 @@ const MethodSelection = ({ method, onChange }) => {
 const GiftSelection = ({ selectedGifts, onChange }) => {
   const [search, setSearch] = useState("");
 
-  const filteredGifts = gifts.filter((g) =>
+  const filteredGifts = giftsCatalog.filter((g) =>
     g.title.toLowerCase().includes(search.toLowerCase())
   );
 
@@ -377,7 +405,7 @@ const GiftSelection = ({ selectedGifts, onChange }) => {
         <div className="mobile-selected-gifts-list">
           {selectedGifts.length > 0 ? (
             selectedGifts.map((giftId) => {
-              const gift = gifts.find(g => g.id === giftId);
+              const gift = giftsCatalog.find(g => g.id === giftId);
               if (!gift) return null;
               
               return (
@@ -488,7 +516,7 @@ const GiftSelection = ({ selectedGifts, onChange }) => {
           <div className="selected-gifts-list" style={{ height: "calc(100% - 40px)" }}>
             {selectedGifts.length > 0 ? (
               selectedGifts.map((giftId) => {
-                const gift = gifts.find(g => g.id === giftId);
+                const gift = giftsCatalog.find(g => g.id === giftId);
                 if (!gift) return null;
                 
                 return (
