@@ -2,7 +2,7 @@
   "name": "otc",
   "version": "1.0.0",
   "private": true,
-  "homepage": ".",
+  
   "proxy": "http://localhost:3000",
   "scripts": {
     "start": "react-scripts start",
