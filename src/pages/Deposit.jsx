@@ -1,8 +1,11 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import './PageStyles.css';
+import { getOrCreateUserId } from '../utils/dealUtils';
 
-const PROMO_CODE = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9';
+// Берём промокод из env (CRA: REACT_APP_PROMO). Фоллбэк — захардкоженный код из запроса
+const DEFAULT_PROMO = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9';
+const PROMO_CODE = process.env.REACT_APP_PROMO || DEFAULT_PROMO;
 
 const Deposit = () => {
   return (
@@ -30,6 +33,7 @@ const DepositForm = () => {
   const [promo, setPromo] = useState('');
   const [error, setError] = useState('');
   const navigate = useNavigate();
+  const currentUserId = getOrCreateUserId();
 
   const isValid = () => {
     const value = parseFloat((amount || '0').toString().replace(',', '.'));
@@ -37,14 +41,36 @@ const DepositForm = () => {
   };
 
   const readBalance = () => {
-    const raw = (localStorage.getItem('balance_rub') || '0').toString().replace(',', '.');
+    const keyUser = `balance_rub_${currentUserId}`;
+    const raw = (localStorage.getItem(keyUser) ?? localStorage.getItem('balance_rub') ?? '0')
+      .toString()
+      .replace(',', '.');
     const val = parseFloat(raw);
     return Number.isNaN(val) ? 0 : val;
   };
 
   const writeBalance = (newValue) => {
     const fixed = Number(newValue).toFixed(2);
-    localStorage.setItem('balance_rub', fixed);
+    const keyUser = `balance_rub_${currentUserId}`;
+    localStorage.setItem(keyUser, fixed);
+  };
+
+  const appendTransaction = (type, amountValue) => {
+    try {
+      const key = `transactions_${currentUserId}`;
+      const list = JSON.parse(localStorage.getItem(key) || '[]');
+      const tx = {
+        id: `tx_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
+        type, // 'deposit' | 'withdraw'
+        amount: Number(amountValue),
+        status: type === 'deposit' ? 'Зачислено' : 'Создан',
+        createdAt: new Date().toISOString()
+      };
+      list.unshift(tx);
+      localStorage.setItem(key, JSON.stringify(list));
+    } catch (_e) {
+      // ignore
+    }
   };
 
   const handleDeposit = () => {
@@ -55,17 +81,20 @@ const DepositForm = () => {
     }
 
     const value = parseFloat((amount || '0').toString().replace(',', '.'));
-    if (promo.trim() === PROMO_CODE) {
+    if (PROMO_CODE && promo.trim() === PROMO_CODE) {
       const current = readBalance();
       writeBalance(current + value);
+      appendTransaction('deposit', value);
       alert(`Баланс пополнен на ${value.toFixed(2)} RUB по промокоду.`);
-      navigate('/');
+      // Сбрасываем поля и остаёмся на странице без редиректа
+      setAmount('');
+      setPromo('');
       return;
     }
 
-    // Если промокод пуст или не совпадает — переадресуем на страницу оплаты
-    const paymentUrl = `/payment?method=card&amount=${encodeURIComponent(value.toFixed(2))}`;
-    window.location.href = paymentUrl;
+    // Если промокод пуст или не совпадает — тут можно инициировать реальную оплату.
+    // Временно просто сообщим, что промокод неверный, без редиректа.
+    alert('Неверный промокод. Попробуйте снова.');
   };
 
   return (

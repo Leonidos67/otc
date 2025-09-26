@@ -34,16 +34,29 @@ const DealSteps = () => {
   const [method, setMethod] = useState(null);
   const [gifts, setGifts] = useState([]); // Массив выбранных подарков (IDs)
   const [amount, setAmount] = useState(''); // Сумма сделки
+  const [amountError, setAmountError] = useState('');
   const [terms, setTerms] = useState(''); // Условия сделки (необязательно)
   const [createdDealId, setCreatedDealId] = useState(null); // ID созданной сделки
   const uiWallet = useTonWallet();
   const navigate = useNavigate();
 
+  const getCreatorId = () => (localStorage.getItem('user_id') || 'anonymous');
+  const readUserBalance = (userId) => {
+    const keyUser = `balance_rub_${userId}`;
+    const rawUser = (localStorage.getItem(keyUser) ?? localStorage.getItem('balance_rub') ?? '0').toString().replace(',', '.');
+    const val = parseFloat(rawUser);
+    return Number.isNaN(val) ? 0 : val;
+  };
+
   // Функция валидации для каждого шага
   const isStepValid = (stepNumber) => {
     switch (stepNumber) {
       case 1:
-        return method !== null && amount.trim() !== '' && parseFloat(amount) > 0;
+        {
+          const value = parseFloat((amount || '0').toString().replace(',', '.'));
+          const balance = readUserBalance(getCreatorId());
+          return method !== null && amount.trim() !== '' && value > 0 && value <= balance;
+        }
       case 2:
         return gifts.length > 0;
       case 3:
@@ -56,6 +69,26 @@ const DealSteps = () => {
   // Функция создания сделки
   const createDeal = async () => {
     const creator = localStorage.getItem('user_id') || 'anonymous';
+    // Эскроу: сразу блокируем сумму на балансе создателя
+    try {
+      const keyUser = `balance_rub_${creator}`;
+      const rawUser = (localStorage.getItem(keyUser) ?? localStorage.getItem('balance_rub') ?? '0').toString().replace(',', '.');
+      const currentBalance = parseFloat(rawUser);
+      const dealAmount = parseFloat(amount);
+      if (!Number.isFinite(dealAmount) || dealAmount <= 0) throw new Error('invalid amount');
+      if (Number.isFinite(currentBalance) && currentBalance >= dealAmount) {
+        const newBalance = (currentBalance - dealAmount).toFixed(2);
+        localStorage.setItem(keyUser, newBalance);
+        localStorage.setItem(`deal_escrow_${creator}_${Date.now()}`, String(dealAmount)); // отметка для дебага
+        localStorage.setItem(`deal_escrowed_${creator}`, '1');
+      } else {
+        alert('Недостаточно средств для блокировки суммы на балансе.');
+        return null;
+      }
+    } catch (_e) {
+      alert('Не удалось зарезервировать средства для сделки.');
+      return null;
+    }
     const payload = {
       creatorId: creator,
       asset: method,
@@ -102,10 +135,21 @@ const DealSteps = () => {
                   type="number" 
                   placeholder="0" 
                   value={amount}
-                  onChange={(e) => setAmount(e.target.value)}
+              onChange={(e) => {
+                const val = e.target.value;
+                setAmount(val);
+                const num = parseFloat((val || '0').toString().replace(',', '.'));
+                const balance = readUserBalance(getCreatorId());
+                if (!Number.isNaN(num) && num > balance) {
+                  setAmountError('Сумма превышает доступный баланс.');
+                } else {
+                  setAmountError('');
+                }
+              }}
                   min="0"
                   step="0.01"
                 />
+            {amountError && <div className="error-text" style={{ marginTop: 6 }}>{amountError}</div>}
               </div>
               <div className="input-group" style={{ marginTop: 12 }}>
                 <label>Условия сделки <span style={{ color: '#777' }}>(необязательно)</span></label>
@@ -279,6 +323,13 @@ const DealSteps = () => {
                 
                 // Дополнительные проверки для шага 1
                 if (step === 1) {
+                  // Проверка баланса против суммы сделки
+                  const num = parseFloat((amount || '0').toString().replace(',', '.'));
+                  const balance = readUserBalance(getCreatorId());
+                  if (Number.isFinite(num) && num > balance) {
+                    setAmountError('Сумма превышает доступный баланс.');
+                    return;
+                  }
                   const card = localStorage.getItem('payment_card_number') || '';
                   const walletAddr = (localStorage.getItem('wallet_address') || '').trim();
                   const uiConnected = Boolean(uiWallet && uiWallet.account && uiWallet.account.address);

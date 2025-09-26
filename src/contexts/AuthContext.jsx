@@ -61,6 +61,14 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (userData) => {
     try {
+      // Локальный вход (регистрации/вход по localStorage) — без верификации по API
+      if (userData && userData.method === 'local') {
+        setUser(userData);
+        localStorage.setItem('telegram_user', JSON.stringify(userData));
+        localStorage.setItem('user_id', userData.id);
+        return;
+      }
+
       const isValid = API_URL ? await verifyTelegramAuth(userData) : true;
       if (!isValid) throw new Error('Telegram authentication failed');
 
@@ -75,6 +83,7 @@ export const AuthProvider = ({ children }) => {
       };
       setUser(userToSave);
       localStorage.setItem('telegram_user', JSON.stringify(userToSave));
+      localStorage.setItem('user_id', userToSave.id);
     } catch (error) {
       console.error('Login error:', error);
       throw error;
@@ -89,8 +98,13 @@ export const AuthProvider = ({ children }) => {
   };
 
   const continueAsGuest = () => {
+    // Разрешаем гостевой доступ, но помечаем простого локального пользователя
     setGuestMode(true);
     localStorage.setItem('guest_mode', 'true');
+    if (!localStorage.getItem('user_id')) {
+      const uid = `guest_${Math.random().toString(36).slice(2, 10)}`;
+      localStorage.setItem('user_id', uid);
+    }
   };
 
   const updateUser = (updates) => {

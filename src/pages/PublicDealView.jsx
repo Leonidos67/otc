@@ -43,6 +43,46 @@ const PublicDealView = () => {
     load();
   }, [dealId]);
 
+  // Перевод средств при смене статуса на completed (страховка, если завершение произошло не через кнопку)
+  useEffect(() => {
+    try {
+      if (!deal || deal.status !== 'completed') return;
+      const paidKey = `deal_paid_${dealId}`;
+      if (localStorage.getItem(paidKey) === '1') return; // уже переведено
+
+      const creatorId = deal.participants?.creator?.id;
+      const takerId = deal.participants?.participant?.id;
+      const amountNum = Number(deal.amount) || 0;
+
+      const readUserBalance = (userId) => {
+        const raw = (localStorage.getItem(`balance_rub_${userId}`) || '0').toString().replace(',', '.');
+        const val = parseFloat(raw);
+        return Number.isNaN(val) ? 0 : val;
+      };
+      const writeUserBalance = (userId, newValue) => {
+        const fixed = Number(newValue).toFixed(2);
+        localStorage.setItem(`balance_rub_${userId}`, fixed);
+      };
+
+      if (creatorId && takerId && amountNum > 0) {
+        const creatorBalance = readUserBalance(creatorId);
+        // Перевод разрешаем, если ранее сумма была зарезервирована, либо хватает средств
+        const escrowed = localStorage.getItem(`deal_escrowed_${creatorId}`) === '1';
+        if (escrowed || creatorBalance >= amountNum) {
+          if (!escrowed) {
+            writeUserBalance(creatorId, creatorBalance - amountNum);
+          }
+          const takerBalance = readUserBalance(takerId);
+          writeUserBalance(takerId, takerBalance + amountNum);
+          localStorage.setItem(paidKey, '1');
+          localStorage.removeItem(`deal_escrowed_${creatorId}`);
+        }
+      }
+    } catch (_e) {
+      // no-op
+    }
+  }, [deal?.status, dealId]);
+
   const copyDealLink = () => {
     const dealUrl = createPublicDealUrl(dealId);
     navigator.clipboard.writeText(dealUrl).then(() => {
@@ -89,6 +129,43 @@ const PublicDealView = () => {
     if (updated) {
       setDeal(updated);
       alert('Готовность подтверждена!');
+      // Если оба участника готовы — выполняем однократный перевод
+      try {
+        const creatorReady = updated?.participants?.creator?.ready;
+        const takerReady = updated?.participants?.participant?.ready;
+        if (creatorReady && takerReady) {
+          const paidKey = `deal_paid_${dealId}`;
+          if (localStorage.getItem(paidKey) !== '1') {
+            const creatorId = updated.participants?.creator?.id;
+            const takerId = updated.participants?.participant?.id;
+            const amountNum = Number(updated.amount) || 0;
+            const readUserBalance = (userId) => {
+              const raw = (localStorage.getItem(`balance_rub_${userId}`) || '0').toString().replace(',', '.');
+              const val = parseFloat(raw);
+              return Number.isNaN(val) ? 0 : val;
+            };
+            const writeUserBalance = (userId, newValue) => {
+              const fixed = Number(newValue).toFixed(2);
+              localStorage.setItem(`balance_rub_${userId}`, fixed);
+            };
+            if (creatorId && takerId && amountNum > 0) {
+              const creatorBalance = readUserBalance(creatorId);
+              const escrowed = localStorage.getItem(`deal_escrowed_${creatorId}`) === '1';
+              if (escrowed || creatorBalance >= amountNum) {
+                if (!escrowed) {
+                  writeUserBalance(creatorId, creatorBalance - amountNum);
+                }
+                const takerBalance = readUserBalance(takerId);
+                writeUserBalance(takerId, takerBalance + amountNum);
+                localStorage.setItem(paidKey, '1');
+                localStorage.removeItem(`deal_escrowed_${creatorId}`);
+              }
+            }
+          }
+        }
+      } catch (_e) {
+        // no-op
+      }
     } else {
       alert('Не удалось подтвердить готовность');
     }
@@ -97,21 +174,63 @@ const PublicDealView = () => {
   const handleCompleteDeal = () => {
     if (window.confirm('Вы уверены, что хотите завершить сделку?')) {
       if (completeDeal(dealId, currentUserId)) {
+        // Перевод средств между участниками после успешного завершения
+        try {
+          const paidKey = `deal_paid_${dealId}`;
+          const alreadyPaid = localStorage.getItem(paidKey) === '1';
+          const updatedDeal = getDealFromUrl(dealId);
+          setDeal(updatedDeal);
+
+          if (!alreadyPaid && updatedDeal && updatedDeal.status === 'completed') {
+            const creatorId = updatedDeal.participants?.creator?.id;
+            const takerId = updatedDeal.participants?.participant?.id;
+            const amountNum = Number(updatedDeal.amount) || 0;
+
+            const readUserBalance = (userId) => {
+              const raw = (localStorage.getItem(`balance_rub_${userId}`) || '0').toString().replace(',', '.');
+              const val = parseFloat(raw);
+              return Number.isNaN(val) ? 0 : val;
+            };
+            const writeUserBalance = (userId, newValue) => {
+              const fixed = Number(newValue).toFixed(2);
+              localStorage.setItem(`balance_rub_${userId}`, fixed);
+            };
+
+            if (creatorId && takerId && amountNum > 0) {
+              const creatorBalance = readUserBalance(creatorId);
+              const escrowed = localStorage.getItem(`deal_escrowed_${creatorId}`) === '1';
+              if (escrowed || creatorBalance >= amountNum) {
+                if (!escrowed) {
+                  writeUserBalance(creatorId, creatorBalance - amountNum);
+                }
+                const takerBalance = readUserBalance(takerId);
+                writeUserBalance(takerId, takerBalance + amountNum);
+                localStorage.setItem(paidKey, '1');
+                localStorage.removeItem(`deal_escrowed_${creatorId}`);
+              } else {
+                alert('Недостаточно средств у создателя для перевода. Перевод не выполнен.');
+              }
+            }
+          }
+        } catch (_e) {
+          // no-op, перевод не критичен для завершения сделки
+        }
         alert('Сделка успешно завершена!');
-        // Обновляем данные сделки
-        const updatedDeal = getDealFromUrl(dealId);
-        setDeal(updatedDeal);
       } else {
         alert('Не удалось завершить сделку');
       }
     }
   };
+  // Кнопка выхода из сделки удалена
 
   // Определяем роль пользователя в сделке
   const isCreator = deal && deal.creatorId === currentUserId;
   const isParticipant = deal && deal.participants.participant && deal.participants.participant.id === currentUserId;
   const canJoin = deal && deal.status === 'waiting_for_participant' && !isCreator && !isParticipant;
   const isInDeal = isCreator || isParticipant;
+  const bothReady = Boolean(
+    deal && deal.participants?.creator?.ready && deal.participants?.participant?.ready
+  );
 
   if (loading) {
     return (
@@ -154,52 +273,87 @@ const PublicDealView = () => {
   return (
     <div className="p-6 profile-page">
       <div className="profile-page-title" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <span>Публичная сделка #{dealId.split('_')[1] || dealId}</span>
+        <span>Публичная сделка</span>
       </div>
       <hr className="divider" style={{ marginTop: '8px' }} />
 
-      {/* Сводка + правые блоки в два столбца */}
-      <div className="public-deal-grid">
-        {/* Левый столбец: Сумма + Иконка + Подарки */}
-        <div>
-          <div
-            className="deal-summary-bar"
-            style={{
-              padding: '12px 16px',
-              marginBottom: 20,
-            }}
-          >
-            {/* Сумма */}
-            <div className="summary-amount">
-              <div className="summary-label">Сумма</div>
-              <div className="summary-value">{deal.amount}</div>
-            </div>
-
-            {/* Иконка обмена */}
-            <div className="summary-exchange" aria-hidden>
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M3 16l4 4 4-4"/>
-                <path d="M7 20V4"/>
-                <path d="M21 8l-4-4-4 4"/>
-                <path d="M17 4v16"/>
-              </svg>
-            </div>
-
-            {/* Подарки */}
-            <div className="summary-gifts">
-              {deal.gifts && deal.gifts.length > 0 ? (
-                deal.gifts.map((gift, idx) => (
-                  <img key={idx} className="summary-gift-img" src={gift.img} alt={gift.title} />
-                ))
-              ) : (
-                <span className="summary-gifts-empty">Подарки не выбраны</span>
-              )}
-            </div>
+      {/* Верхний блок без фона: ID сделки, Сумма, Статус и Дата создания */}
+      <div className="public-deal-top">
+        <div className="top-row">
+          <div className="top-left">
+            <div className="deal-id-inline">ID: {deal.id || (dealId.split('_')[1] || dealId)}</div>
+            <h2>Сумма</h2>
+            <div className="amount-value amount-large">{deal.amount}</div>
+          </div>
+          <div className="top-right">
+            <span className={`status-badge ${deal.status}`}>
+              {deal.status === 'waiting_for_participant' ? 'Ожидает участника' :
+               deal.status === 'waiting_for_confirmation' ? 'Ожидает подтверждения' :
+               deal.status === 'in_progress' ? 'В процессе' :
+               deal.status === 'completed' ? 'Завершена' : 
+               deal.status === 'cancelled' ? 'Отменена' : deal.status}
+            </span>
+            <div className="deal-date">Создана: {formatDate(deal.createdAt)}</div>
           </div>
         </div>
+      </div>
 
-        {/* Правый столбец: Участники + NFT Подарки */}
-        <div className="public-deal-right">
+      {/* Действия — сразу под суммой, во всю ширину */}
+      <div className="deal-actions-card">
+        <h2>Действия</h2>
+        {deal.status === 'waiting_for_participant' && (
+          <div className="actions-hint" style={{ color: '#aaa', marginBottom: 8 }}>
+            Пригласите участника в сделку, чтобы стали доступны все действия.
+          </div>
+        )}
+        <div className="actions-grid">
+          <button 
+            onClick={copyDealLink}
+            className="action-button primary"
+          >
+            📋 Скопировать ссылку
+          </button>
+          {canJoin && (
+            <button 
+              onClick={handleJoinDeal}
+              className="action-button success"
+            >
+              ✅ Присоединиться к сделке
+            </button>
+          )}
+          {isInDeal && (deal.status === 'waiting_for_confirmation' || deal.status === 'in_progress') && (
+            <>
+              <button 
+                onClick={() => handleConfirmReadiness(true)}
+                className="action-button success"
+                disabled={isCreator ? deal.participants.creator.ready : deal.participants.participant?.ready}
+              >
+                ✅ Подтвердить готовность
+              </button>
+              <button 
+                onClick={() => handleConfirmReadiness(false)}
+                className="action-button warning"
+                disabled={isCreator ? !deal.participants.creator.ready : !deal.participants.participant?.ready}
+              >
+                ❌ Отменить готовность
+              </button>
+          {/* Кнопка выхода удалена по требованию */}
+            </>
+          )}
+          {isInDeal && deal.status === 'in_progress' && (
+            <button 
+              onClick={handleCompleteDeal}
+              className="action-button success"
+            >
+              🎉 Завершить сделку
+            </button>
+          )}
+        </div>
+      </div>
+
+      {/* Секции ниже: двухколоночная сетка 2/3 слева и 1/3 справа */}
+      <div className="public-deal-sections">
+        <div className="col-left">
           {/* Участники сделки */}
           <div className="deal-participants-card">
             <h2>Участники сделки</h2>
@@ -215,7 +369,6 @@ const PublicDealView = () => {
                   </span>
                 </div>
               </div>
-              
               {deal.participants.participant ? (
                 <div className="participant-item">
                   <div className="participant-info">
@@ -241,7 +394,33 @@ const PublicDealView = () => {
               )}
             </div>
           </div>
+          {/* Детали сделки */}
+          <div className="deal-info-card deal-info-plain">
+            <div className="deal-details">
+              <h2>Детали сделки</h2>
+              <div className="details-grid">
+                <div className="detail-item">
+                  <span className="detail-label">Метод оплаты:</span>
+                  <span className="detail-value">{deal.method}</span>
+                </div>
+                <div className="detail-item">
+                  <span className="detail-label">Сумма:</span>
+                  <span className="detail-value">{deal.amount}</span>
+                </div>
+                <div className="detail-item">
+                  <span className="detail-label">Количество подарков:</span>
+                  <span className="detail-value">{deal.gifts.length}</span>
+                </div>
+                <div className="detail-item">
+                  <span className="detail-label">ID сделки:</span>
+                  <span className="detail-value deal-id">{deal.id}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
 
+        <div className="col-right">
           {/* NFT Подарки */}
           <div className="deal-gifts-card">
             <h2>NFT Подарки</h2>
@@ -261,98 +440,7 @@ const PublicDealView = () => {
         </div>
       </div>
 
-      {/* Детали сделки — во всю ширину ниже */}
-      <div className="deal-info-card">
-        <div className="deal-header">
-          <div className="deal-status">
-            <span className={`status-badge ${deal.status}`}>
-              {deal.status === 'waiting_for_participant' ? 'Ожидает участника' :
-               deal.status === 'waiting_for_confirmation' ? 'Ожидает подтверждения' :
-               deal.status === 'in_progress' ? 'В процессе' :
-               deal.status === 'completed' ? 'Завершена' : 
-               deal.status === 'cancelled' ? 'Отменена' : deal.status}
-            </span>
-          </div>
-          <div className="deal-date">
-            Создана: {formatDate(deal.createdAt)}
-          </div>
-        </div>
-
-        <div className="deal-details">
-          <h2>Детали сделки</h2>
-          <div className="details-grid">
-            <div className="detail-item">
-              <span className="detail-label">Метод оплаты:</span>
-              <span className="detail-value">{deal.method}</span>
-            </div>
-            <div className="detail-item">
-              <span className="detail-label">Сумма:</span>
-              <span className="detail-value">{deal.amount}</span>
-            </div>
-            <div className="detail-item">
-              <span className="detail-label">Количество подарков:</span>
-              <span className="detail-value">{deal.gifts.length}</span>
-            </div>
-            <div className="detail-item">
-              <span className="detail-label">ID сделки:</span>
-              <span className="detail-value deal-id">{deal.id}</span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Действия */}
-      <div className="deal-actions-card">
-        <h2>Действия</h2>
-        <div className="actions-grid">
-          <button 
-            onClick={copyDealLink}
-            className="action-button primary"
-          >
-            📋 Скопировать ссылку
-          </button>
-          
-          {/* Кнопка присоединения к сделке */}
-          {canJoin && (
-            <button 
-              onClick={handleJoinDeal}
-              className="action-button success"
-            >
-              ✅ Присоединиться к сделке
-            </button>
-          )}
-          
-          {/* Кнопки подтверждения готовности */}
-          {isInDeal && (deal.status === 'waiting_for_confirmation' || deal.status === 'in_progress') && (
-            <>
-              <button 
-                onClick={() => handleConfirmReadiness(true)}
-                className="action-button success"
-                disabled={isCreator ? deal.participants.creator.ready : deal.participants.participant?.ready}
-              >
-                ✅ Подтвердить готовность
-              </button>
-              <button 
-                onClick={() => handleConfirmReadiness(false)}
-                className="action-button warning"
-                disabled={isCreator ? !deal.participants.creator.ready : !deal.participants.participant?.ready}
-              >
-                ❌ Отменить готовность
-              </button>
-            </>
-          )}
-          
-          {/* Кнопка завершения сделки */}
-          {isInDeal && deal.status === 'in_progress' && (
-            <button 
-              onClick={handleCompleteDeal}
-              className="action-button success"
-            >
-              🎉 Завершить сделку
-            </button>
-          )}
-        </div>
-      </div>
+      
     </div>
   );
 };

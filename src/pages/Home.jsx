@@ -5,13 +5,17 @@ import { useAuth } from '../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import AnimatedGifts from '../components/AnimatedGifts/AnimatedGifts';
 import './PageStyles.css';
+import { getOrCreateUserId } from '../utils/dealUtils';
 import { Copy } from '../components/Icons/Copy.jsx';
+import UserDealsChart from '../components/UserDealsChart.jsx';
+import NpmSparkLine from '../components/NpmSparkLine.jsx';
 
 const Home = () => {
   const { user, guestMode, login, logout } = useAuth();
   const navigate = useNavigate();
   const [usdRate, setUsdRate] = useState(() => (parseFloat((localStorage.getItem('usd_rate') || '100').toString().replace(',', '.')) || 100));
-  const balanceRub = (parseFloat((localStorage.getItem('balance_rub') || '0').toString().replace(',', '.')) || 0);
+  const currentUserId = getOrCreateUserId();
+  const balanceRub = (parseFloat((localStorage.getItem(`balance_rub_${currentUserId}`) ?? localStorage.getItem('balance_rub') ?? '0').toString().replace(',', '.')) || 0);
   const balanceUsd = balanceRub / (usdRate > 0 ? usdRate : 100);
 
   // Управляем классом body для убирания padding у content
@@ -135,6 +139,23 @@ const Home = () => {
             >
               Вывести
             </button>
+            <button
+              className="balance-btn transactions-btn"
+              onClick={() => navigate('/transactions')}
+            >
+              История транзакций
+            </button>
+          </div>
+        </div>
+
+        {/* Три горизонтальных блока */}
+        <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr', gap: 16, marginBottom: 16 }}>
+          <div className="content-box" style={{ background: '#0d0d0d', border: '1px solid #222', borderRadius: 12, padding: 12 }}>
+            <UserDealsChart />
+          </div>
+          <div className="content-box" style={{ background: '#0d0d0d', border: '1px solid #222', borderRadius: 12, padding: 12 }}>
+            <h3 style={{ color: '#fff', marginTop: 0, marginBottom: 8, fontSize: 16 }}>Weekly downloads</h3>
+            <NpmSparkLine />
           </div>
         </div>
 

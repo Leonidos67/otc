@@ -14,6 +14,7 @@ import Withdraw from './pages/Withdraw';
 import Deposit from './pages/Deposit';
 import Policy from './pages/Policy';
 import Login from './pages/Login';
+import Transactions from './pages/Transactions';
 import './App.css';
 
 // Protected Route component
@@ -104,6 +105,13 @@ function AppContent() {
         </ProtectedRoute>
       } />
       <Route path="/policy" element={<Policy />} />
+      <Route path="/transactions" element={
+        <ProtectedRoute>
+          <Layout>
+            <Transactions />
+          </Layout>
+        </ProtectedRoute>
+      } />
     </Routes>
   );
 }

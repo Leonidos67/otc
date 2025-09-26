@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import './PageStyles.css';
 import { useTonWallet } from '@tonconnect/ui-react';
 import { tonConnect } from '../utils/ton/tonConnect';
+import { getOrCreateUserId } from '../utils/dealUtils';
 
 const Withdraw = () => {
   return (
@@ -26,9 +27,12 @@ export default Withdraw;
 const WithdrawForm = () => {
   const [method, setMethod] = useState(null);
   const [amount, setAmount] = useState('');
+  const [currency, setCurrency] = useState('RUB'); // RUB | USD
   const [error, setError] = useState('');
   const uiWallet = useTonWallet();
   const navigate = useNavigate();
+  const currentUserId = getOrCreateUserId();
+  const usdRate = useMemo(() => (parseFloat((localStorage.getItem('usd_rate') || '100').toString().replace(',', '.')) || 100), []);
 
   const validateRequisites = () => {
     if (method === 'На карту') {
@@ -60,14 +64,36 @@ const WithdrawForm = () => {
   };
 
   const getBalanceRub = () => {
-    const raw = (localStorage.getItem('balance_rub') || '0').toString().replace(',', '.');
+    const keyUser = `balance_rub_${currentUserId}`;
+    const raw = (localStorage.getItem(keyUser) ?? localStorage.getItem('balance_rub') ?? '0')
+      .toString()
+      .replace(',', '.');
     const val = parseFloat(raw);
     return Number.isNaN(val) ? 0 : val;
   };
 
   const writeBalanceRub = (newValue) => {
     const fixed = Number(newValue).toFixed(2);
-    localStorage.setItem('balance_rub', fixed);
+    const keyUser = `balance_rub_${currentUserId}`;
+    localStorage.setItem(keyUser, fixed);
+  };
+
+  const appendTransaction = (type, amountValue) => {
+    try {
+      const key = `transactions_${currentUserId}`;
+      const list = JSON.parse(localStorage.getItem(key) || '[]');
+      const tx = {
+        id: `tx_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
+        type, // 'deposit' | 'withdraw'
+        amount: Number(amountValue),
+        status: 'Создан',
+        createdAt: new Date().toISOString()
+      };
+      list.unshift(tx);
+      localStorage.setItem(key, JSON.stringify(list));
+    } catch (_e) {
+      // ignore
+    }
   };
 
   const handleWithdraw = () => {
@@ -76,18 +102,24 @@ const WithdrawForm = () => {
       setError('Выберите метод и введите корректную сумму.');
       return;
     }
-    const balance = getBalanceRub();
+    const balanceRub = getBalanceRub();
     const value = parseFloat((amount || '0').toString().replace(',', '.'));
-    if (value > balance) {
+    const valueRub = currency === 'RUB' ? value : value * (usdRate > 0 ? usdRate : 100);
+    if (valueRub > balanceRub) {
       setError('Сумма больше, чем доступный баланс.');
       return;
     }
     if (!validateRequisites()) return;
 
-    // Здесь будет реальная логика вывода. Пока просто уведомление.
-    writeBalanceRub(Math.max(0, balance - value));
-    alert(`Заявка на вывод создана:\nМетод: ${method}\nСумма: ${amount}`);
-    navigate('/');
+    // Здесь будет реальная логика вывода. Пока списываем средства и показываем уведомление.
+    writeBalanceRub(Math.max(0, balanceRub - valueRub));
+    appendTransaction('withdraw', valueRub);
+    const pretty = currency === 'RUB'
+      ? `${Number(value).toFixed(2)} RUB`
+      : `${Number(value).toFixed(2)} USD (≈ ${valueRub.toFixed(2)} RUB)`;
+    alert(`Заявка на вывод создана:\nМетод: ${method}\nСумма: ${pretty}`);
+    // Остаёмся на странице, сбрасываем поле суммы
+    setAmount('');
   };
 
   return (
@@ -95,7 +127,28 @@ const WithdrawForm = () => {
       <div className="deal-content">
         <div className="grid" style={{ display: 'grid', gridTemplateColumns: '1fr', gap: 12 }}>
           <div style={{ margin: 0 }}>
+            {/* Ваш баланс — вверху формы */}
             <div className="input-group" style={{ marginTop: 0 }}>
+              <label>Ваш баланс</label>
+              <div style={{
+                display: 'inline-flex',
+                alignItems: 'baseline',
+                gap: 8,
+                background: '#0d0d0d',
+                border: '1px solid #222',
+                borderRadius: 6,
+                padding: '10px 12px'
+              }}>
+                <span style={{ color: '#fff', fontWeight: 700 }}>
+                  {getBalanceRub().toFixed(2)} RUB
+                </span>
+                <span style={{ color: '#aaa', fontWeight: 600 }}>
+                  (≈ ${ (getBalanceRub() / (usdRate > 0 ? usdRate : 100)).toFixed(2) })
+                </span>
+              </div>
+            </div>
+
+            <div className="input-group" style={{ marginTop: 12 }}>
               <label>Куда вывести: <span style={{color: '#ff4d4f'}}>*</span></label>
               <select value={method || ''} onChange={(e) => setMethod(e.target.value)}>
                 <option value="" disabled>Выберите метод</option>
@@ -103,7 +156,16 @@ const WithdrawForm = () => {
                 <option value="На карту">На карту</option>
               </select>
             </div>
-            <div className="input-group" style={{ marginTop: 20 }}>
+
+            <div className="input-group" style={{ marginTop: 12 }}>
+              <label>Валюта вывода: <span style={{color: '#ff4d4f'}}>*</span></label>
+              <select value={currency} onChange={(e) => setCurrency(e.target.value)}>
+                <option value="RUB">RUB</option>
+                <option value="USD">USD</option>
+              </select>
+            </div>
+
+            <div className="input-group" style={{ marginTop: 12 }}>
               <label>Введите сумму вывода: <span style={{color: '#ff4d4f'}}>*</span></label>
               <input
                 type="number"
@@ -113,6 +175,13 @@ const WithdrawForm = () => {
                 min="0"
                 step="0.01"
               />
+              {amount && (
+                <div style={{ color: '#888', fontSize: 12, marginTop: 6 }}>
+                  {currency === 'RUB'
+                    ? `≈ $${ (parseFloat((amount || '0').toString().replace(',', '.')) / (usdRate > 0 ? usdRate : 100)).toFixed(2) }`
+                    : `≈ ${(parseFloat((amount || '0').toString().replace(',', '.')) * (usdRate > 0 ? usdRate : 100)).toFixed(2)} RUB`}
+                </div>
+              )}
             </div>
             {error && <div className="error-text" style={{ marginTop: 8 }}>{error}</div>}
 

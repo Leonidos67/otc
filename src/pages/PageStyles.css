@@ -1342,6 +1342,124 @@ button.WalletConnectButton {
   padding: 24px;
 }
 
+/* Публичная сделка — левая колонка карточка суммы/изображения/подарков */
+.deal-amount-card {
+  background: #000000;
+  border: 1px solid #333;
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 16px;
+}
+
+.deal-amount-card h2 {
+  margin: 0 0 8px 0;
+  color: #ccc;
+  font-size: 1.1rem;
+  font-weight: 600;
+  text-align: left;
+}
+
+.deal-amount-card .amount-value {
+  color: #fff;
+  font-weight: 700;
+  font-size: 28px;
+  margin-bottom: 16px;
+  text-align: left; /* число под заголовком слева */
+}
+
+.deal-amount-card .main-gift {
+  display: flex;
+  align-items: center;
+  justify-content: center; /* изображение по центру */
+  margin: 12px 0 16px 0;
+  position: relative; /* для псевдо-элемента разделителя */
+}
+
+.deal-amount-card .main-gift svg {
+  width: 20px;
+  height: 20px;
+  color: #ffffff;
+  opacity: 0.9;
+  position: relative; /* поверх разделительной полосы */
+  z-index: 1;
+}
+
+/* Разделительная полоса на изображение во всю ширину блока main-gift */
+.deal-amount-card .main-gift::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  height: 1px;
+  background-color: #333;
+  z-index: 0;
+}
+
+/* Верхний блок без фона: ID, сумма, статус, дата */
+.public-deal-top {
+  width: 100%;
+  margin-top: 16px;
+  margin-bottom: 16px;
+}
+
+.public-deal-top .top-row {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.public-deal-top .top-left h2 {
+  margin: 0 0 6px 0;
+  color: #ccc;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.public-deal-top .deal-id-inline {
+  color: #888;
+  font-size: 0.95rem;
+  margin-bottom: 8px;
+}
+
+.public-deal-top .amount-large {
+  font-size: 32px;
+  margin: 0;
+}
+
+.public-deal-top .top-right {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: flex-end;
+}
+
+@media (max-width: 640px) {
+  .public-deal-top .top-row {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .public-deal-top .top-right {
+    align-items: flex-start;
+  }
+}
+
+.deal-amount-card .gifts-strip {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.deal-amount-card .gifts-strip img {
+  width: 64px;
+  height: 64px;
+  border-radius: 8px;
+  border: 1px solid #333;
+  object-fit: cover;
+}
+
 .deal-header {
   display: flex;
   justify-content: space-between;
@@ -1407,6 +1525,14 @@ button.WalletConnectButton {
   color: #fff;
   font-size: 1.25rem;
   font-weight: 600;
+}
+
+/* Вариант деталей без фона и без отступов */
+.deal-info-plain {
+  background: transparent !important;
+  border: none !important;
+  border-radius: 0 !important;
+  padding: 0 !important;
 }
 
 .details-grid {
@@ -2076,7 +2202,7 @@ body.home-page-active .content {
 .copy-btn {
   display: inline-flex;
   align-items: center;
-  gap: px;
+  margin-left: 5px;
   background: #1a1a1a;
   border: 1px solid #333;
   color: #fff;
@@ -2123,6 +2249,19 @@ body.home-page-active .content {
   background: #2a2a2a;
   border-color: #444;
   color: #fca5a5;
+}
+
+/* Стиль для кнопки История транзакций — такой же, но с белым текстом */
+.transactions-btn {
+  background: #1a1a1a;
+  border: 1px solid #333;
+  color: #ffffff;
+}
+
+.transactions-btn:hover {
+  background: #2a2a2a;
+  border-color: #444;
+  color: #ffffff;
 }
 
 .home-header {
@@ -2285,23 +2424,44 @@ body.home-page-active .content {
 }
 
 /* PublicDealView two-column grid */
-.public-deal-grid {
-  display: grid;
-  grid-template-columns: 1.2fr 1fr;
-  gap: 16px;
+/* Публичная сделка — теперь все блоки в одну колонку,
+   сверху — во всю ширину карточка суммы и подарков */
+.public-deal-grid { /* больше не используется как сетка контента ниже */
+  display: block;
   width: 100%;
-  margin-bottom: 16px;
-}
-.public-deal-right > .deal-participants-card,
-.public-deal-right > .deal-gifts-card {
+  margin-top: 16px; /* отступ сверху под просьбу */
   margin-bottom: 16px;
 }
 
+/* Карточка суммы сверху — тянется на всю ширину и имеет дополнительный отступ */
+.deal-amount-top {
+  width: 100%;
+}
+
+/* Двухколоночная секция: слева (2/3) — участники, действия, детали; справа (1/3) — подарки */
+.public-deal-sections {
+  display: grid;
+  grid-template-columns: 2fr 1fr; /* 2/3 и 1/3 */
+  gap: 16px;
+  width: 100%;
+  margin: 0; /* убрать внешние отступы родителя */
+}
+
+.public-deal-sections .col-left,
+.public-deal-sections .col-right {
+  display: flex;
+  flex-direction: column;
+  gap: 16px; /* равномерные интервалы между карточками */
+}
+
+/* На узких экранах — одна колонка */
 @media (max-width: 900px) {
-  .public-deal-grid {
+  .public-deal-sections {
     grid-template-columns: 1fr;
   }
 }
+
+/* Адаптив не требуется, т.к. одна колонка используется везде */
 
 /* Стили для кнопки редактирования профиля */
 .profile-edit-btn {
