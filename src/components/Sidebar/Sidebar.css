@@ -82,6 +82,21 @@
   width: 100%;
 }
 
+.support-item {
+  background-color: #1a1a1a;
+  font-weight: 600;
+  color: #fff !important;
+  border: 1px solid #333;
+  flex: 1;
+  justify-content: center;
+  margin-bottom: 8px;
+}
+
+.support-item:hover {
+  background-color: #2d2d2d;
+  border-color: #444;
+}
+
 .profile-item {
   background-color: #1a1a1a;
   font-weight: 600;

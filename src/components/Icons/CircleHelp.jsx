@@ -1,16 +1,9 @@
 "use client";
 
-import type { Transition } from "motion/react";
-import { motion, useAnimation } from "motion/react";
+import React from "react";
+import { motion } from "motion/react";
 
-interface CircleHelpProps extends React.SVGAttributes<SVGSVGElement> {
-  width?: number;
-  height?: number;
-  strokeWidth?: number;
-  stroke?: string;
-}
-
-const defaultTransition: Transition = {
+const defaultTransition = {
   type: "spring",
   stiffness: 250,
   damping: 25,
@@ -21,23 +14,11 @@ const CircleHelp = ({
   height = 28,
   strokeWidth = 2,
   stroke = "#ffffff",
+  animate = false,
   ...props
-}: CircleHelpProps) => {
-  const controls = useAnimation();
-
+}) => {
   return (
-    <div
-      style={{
-        cursor: "pointer",
-        userSelect: "none",
-        padding: "8px",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-      }}
-      onMouseEnter={() => controls.start("animate")}
-      onMouseLeave={() => controls.start("normal")}
-    >
+    <div style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
       <svg
         xmlns="http://www.w3.org/2000/svg"
         width={width}
@@ -57,7 +38,7 @@ const CircleHelp = ({
             animate: { translateY: "-2px" },
           }}
           transition={defaultTransition}
-          animate={controls}
+          animate={animate ? "animate" : "normal"}
           initial="normal"
         >
           <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" />

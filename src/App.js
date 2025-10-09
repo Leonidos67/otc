@@ -15,6 +15,7 @@ import Deposit from './pages/Deposit';
 import Policy from './pages/Policy';
 import Login from './pages/Login';
 import Transactions from './pages/Transactions';
+import Support from './pages/Support';
 import './App.css';
 
 // Protected Route component
@@ -109,6 +110,13 @@ function AppContent() {
         <ProtectedRoute>
           <Layout>
             <Transactions />
+          </Layout>
+        </ProtectedRoute>
+      } />
+      <Route path="/support" element={
+        <ProtectedRoute>
+          <Layout>
+            <Support />
           </Layout>
         </ProtectedRoute>
       } />

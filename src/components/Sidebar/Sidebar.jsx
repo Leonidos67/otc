@@ -7,6 +7,7 @@ import UserIcon from '../Icons/User';
 import AlbumIcon from '../Icons/Album';
 import BlocksIcon from '../Icons/Blocks';
 import MenuIcon from '../Icons/Menu';
+import { CircleHelp } from '../Icons/CircleHelp.jsx';
 
 const Sidebar = ({ isOpen = true, onToggle }) => {
   const navigate = useNavigate();
@@ -21,7 +22,8 @@ const Sidebar = ({ isOpen = true, onToggle }) => {
   const menuItems = [
     { path: '/', label: 'Главная' },
     { path: '/deals', label: 'Сделки' },
-    { path: '/profile', label: 'Мой профиль' }
+    { path: '/profile', label: 'Мой профиль' },
+    { path: '/support', label: 'Техподдержка' }
   ];
 
   const handleNavigation = (path) => {
@@ -63,6 +65,7 @@ const Sidebar = ({ isOpen = true, onToggle }) => {
                   <UserIcon animate={isActive} />
                 )
               ) : null}
+              {item.path === '/support' ? <CircleHelp width={20} height={20} stroke="#ffffff" strokeWidth={1.8} animate={isActive} /> : null}
               <span className="nav-text">{item.label}</span>
             </button>
           );

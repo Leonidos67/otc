@@ -149,7 +149,7 @@ const Home = () => {
         </div>
 
         {/* Три горизонтальных блока */}
-        <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr', gap: 16, marginBottom: 16 }}>
+        {/* <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr', gap: 16, marginBottom: 16 }}>
           <div className="content-box" style={{ background: '#0d0d0d', border: '1px solid #222', borderRadius: 12, padding: 12 }}>
             <UserDealsChart />
           </div>
@@ -157,7 +157,7 @@ const Home = () => {
             <h3 style={{ color: '#fff', marginTop: 0, marginBottom: 8, fontSize: 16 }}>Weekly downloads</h3>
             <NpmSparkLine />
           </div>
-        </div>
+        </div> */}
 
         <div className="content-box" style={{ marginBottom: '16px' }}>
           <h2>Подключите кошелек TON</h2>

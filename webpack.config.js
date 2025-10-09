@@ -1,5 +1,4 @@
 module.exports = {
-  // ...
   module: {
     rules: [
       {
@@ -7,7 +6,7 @@ module.exports = {
         enforce: "pre",
         use: ["source-map-loader"],
         exclude: [
-          /node_modules\/@tonconnect\/sdk/  // игнорим SDK
+          /node_modules\/@tonconnect\/sdk/
         ]
       }
     ]
