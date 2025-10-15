@@ -1561,10 +1561,6 @@ button.WalletConnectButton {
 
 .deal-id {
   font-family: monospace;
-  background: #1a1a1a;
-  padding: 4px 8px;
-  border-radius: 4px;
-  font-size: 12px;
 }
 
 .gifts-grid {
@@ -1600,8 +1596,8 @@ button.WalletConnectButton {
 }
 
 .actions-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  display: flex;
+  flex-direction: column;
   gap: 12px;
 }
 
@@ -1609,7 +1605,7 @@ button.WalletConnectButton {
   padding: 12px 20px;
   border-radius: 8px;
   border: 1px solid #333;
-  background: #1a1a1a;
+  background: rgba(255, 255, 255, 0.1);
   color: #fff;
   font-weight: 600;
   cursor: pointer;
@@ -1620,40 +1616,16 @@ button.WalletConnectButton {
   gap: 8px;
 }
 
-.action-button:hover {
-  background: #2d2d2d;
-  border-color: #444;
-}
+.action-button:hover { background: #000000; border-color: #444; }
 
-.action-button.primary {
-  background: #3b82f6;
-  border-color: #3b82f6;
-}
+.action-button.primary { background: rgba(255, 255, 255, 0.1); border-color: #333; }
+.action-button.primary:hover { background: #000000; border-color: #444; }
 
-.action-button.primary:hover {
-  background: #2563eb;
-  border-color: #2563eb;
-}
+.action-button.secondary { background: rgba(255, 255, 255, 0.1); border-color: #333; }
+.action-button.secondary:hover { background: #000000; border-color: #444; }
 
-.action-button.secondary {
-  background: #6b7280;
-  border-color: #6b7280;
-}
-
-.action-button.secondary:hover {
-  background: #4b5563;
-  border-color: #4b5563;
-}
-
-.action-button.danger {
-  background: #ef4444;
-  border-color: #ef4444;
-}
-
-.action-button.danger:hover {
-  background: #dc2626;
-  border-color: #dc2626;
-}
+.action-button.danger { background: #ef4444; border-color: #ef4444; }
+.action-button.danger:hover { background: #dc2626; border-color: #dc2626; }
 
 .action-button.success {
   background: #10b981;
@@ -1868,10 +1840,6 @@ button.WalletConnectButton {
 
 .deal-id {
   font-family: monospace;
-  background: #1a1a1a;
-  padding: 4px 8px;
-  border-radius: 4px;
-  font-size: 12px;
   color: #ccc;
 }
 

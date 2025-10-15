@@ -144,8 +144,8 @@ const Support = () => {
           <div className="success-icon">✓</div>
           <h2>Сообщение отправлено!</h2>
           <p>Мы получили ваше сообщение и свяжемся с вами в ближайшее время.</p>
-          <button onClick={resetForm} className="btn-primary">
-            Отправить еще одно сообщение
+          <button onClick={resetForm} className="manage-wallet-btn" style={{ width: "max-content" }}>
+            Закрыть
           </button>
         </div>
       </div>
@@ -259,7 +259,8 @@ const Support = () => {
               <div className="form-actions">
                 <button 
                   type="submit" 
-                  className="btn-primary"
+                  className="manage-wallet-btn"
+                  // style={{  }}
                   disabled={isSubmitting}
                 >
                   {isSubmitting ? 'Отправка...' : 'Отправить сообщение'}
@@ -274,11 +275,12 @@ const Support = () => {
               <div className="info-grid">
                 <div className="info-item">
                   <h4>Время ответа</h4>
-                  <p>Обычно мы отвечаем в течение 2 рабочих дней</p>
+                  <p style={{fontStyle: 'italic'}}>Обычно мы отвечаем в течение 6 часов.</p>
+                  <p style={{fontStyle: 'italic'}}>*Иногда ожидание ответа занимает до 10 рабочих дней</p>
                 </div>
                 <div className="info-item">
                   <h4>Срочные вопросы</h4>
-                  <p>Для срочных вопросов выберите приоритет "Срочный"</p>
+                  <p style={{fontStyle: 'italic'}}>Для срочных вопросов выберите приоритет "Срочный"</p>
                 </div>
                 {/* <div className="info-item">
                   <h4>Контакты</h4>
@@ -307,9 +309,9 @@ const Support = () => {
                 {tickets.map((ticket) => (
                   <div key={ticket.id} className="ticket-card">
                     <div className="ticket-header">
-                      <div className="ticket-status-top">
+                      {/* <div className="ticket-status-top">
                         <span className="status-badge">{ticket.status}</span>
-                      </div>
+                      </div> */}
                       <div className="ticket-title-row">
                         <h3 className="ticket-subject">{ticket.subject}</h3>
                         <span className="ticket-id">#{ticket.id.slice(-6)}</span>
@@ -319,6 +321,7 @@ const Support = () => {
                         >
                           {getPriorityText(ticket.priority)}
                         </span>
+                        <span className="status-badge">{ticket.status}</span>
                       </div>
                       <div className="ticket-date-row">
                         <span className="ticket-date">{formatDate(ticket.createdAt)}</span>
